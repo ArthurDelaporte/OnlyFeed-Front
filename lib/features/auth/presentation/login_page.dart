@@ -2,8 +2,11 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:onlyfeed_frontend/shared/shared.dart';
+import '../../../core/widgets/scaffold_with_header.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -27,29 +30,39 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Connexion réussie")));
-        print('Login ${_emailCtrl.text}');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.log.successful".tr())));
         context.go('/');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur de connexion")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.log.error".tr())));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur : $e")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${"core.error".tr()} : $e")));
     }
+  }
+
+  void goToSignup() {
+    context.go('/signup');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Connexion")),
+    final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
+
+    return ScaffoldWithHeader(
       body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
+        padding: EdgeInsets.all(24),
+        child: ListView(
           children: [
-            TextField(controller: _emailCtrl, decoration: const InputDecoration(labelText: 'Email')),
-            TextField(controller: _passwordCtrl, decoration: const InputDecoration(labelText: 'Mot de passe'), obscureText: true),
-            const SizedBox(height: 20),
-            ElevatedButton(onPressed: _login, child: const Text("Se connecter")),
+            Center(
+              child: Text("user.log.connection".tr().capitalize(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            ),
+            SizedBox(height: 16),
+            TextField(controller: _emailCtrl, decoration: InputDecoration(labelText: 'user.field.email'.tr().capitalize())),
+            TextField(controller: _passwordCtrl, decoration: InputDecoration(labelText: 'user.field.password'.tr().capitalize()), obscureText: true),
+            SizedBox(height: 20),
+            ElevatedButton(onPressed: _login, child: Text('user.log.login'.tr().capitalize())),
+            SizedBox(height: 20),
+            ElevatedButton(onPressed: goToSignup, child: Text('user.log.no_account'.tr())),
           ],
         ),
       ),

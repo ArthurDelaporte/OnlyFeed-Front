@@ -1,0 +1,44 @@
+{
+  "app": {
+    "title": "OnlyFeed",
+    "welcome": "Welcome to OnlyFeed 👋"
+  },
+  "core": {
+    "error": "error"
+  },
+  "user": {
+    "profile": "profile",
+    "field": {
+      "email": "email",
+      "password": "password",
+      "username": "username",
+      "firstname": "firstname",
+      "lastname": "lastname",
+      "bio": "bio",
+      "profile_picture": "profile picture",
+      "fields_required": "Email, password and username fields are required.",
+      "profile_picture_invalid": "Invalid photo format. Allowed formats: JPG, PNG, WebP, HEIC."
+    },
+    "lang": {
+      "language": "language",
+      "french": "french",
+      "english": "english",
+      "invalid": "Invalid language. Choose ‘fr’ or ‘en’."
+    },
+    "sign": {
+      "signup": "sign up",
+      "register": "register",
+      "registration": "registration",
+      "successful": "Successful registration",
+      "error": "Registration error",
+      "already_account": "Already have an account? Login"
+    },
+    "log": {
+      "login": "login",
+      "connection": "connection",
+      "successful": "Successful connection",
+      "error": "Connection error",
+      "no_account": "Don't have an account yet? Sign in"
+    }
+  }
+}
