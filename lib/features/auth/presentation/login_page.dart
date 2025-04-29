@@ -1,12 +1,14 @@
 // lib/features/auth/presentation/login_page.dart
 import 'dart:convert';
+
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:onlyfeed_frontend/shared/shared.dart';
-import '../../../core/widgets/scaffold_with_header.dart';
+import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,7 +20,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
-  final Dio _dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080'));
+  final Dio _dio = DioClient().dio;
 
   void _login() async {
     try {
@@ -30,8 +32,16 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.log.successful".tr())));
-        context.go('/');
+        final accessToken = response.data['access_token'];
+
+        if (accessToken != null) {
+          await TokenManager.save(accessToken);
+
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.log.successful".tr())));
+          context.go('/');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("core.error".tr())));
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.log.error".tr())));
       }

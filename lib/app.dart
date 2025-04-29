@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'features/auth/presentation/login_page.dart';
-import 'features/auth/presentation/signup_page.dart';
-import 'features/home/presentation/home_page.dart';
+
+import 'package:onlyfeed_frontend/features/auth/presentation/login_page.dart';
+import 'package:onlyfeed_frontend/features/auth/presentation/signup_page.dart';
+import 'package:onlyfeed_frontend/features/home/presentation/home_page.dart';
 
 class OnlyFeedApp extends StatelessWidget {
   OnlyFeedApp({super.key});

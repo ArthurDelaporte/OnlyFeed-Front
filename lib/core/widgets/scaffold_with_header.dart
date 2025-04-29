@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
-import '../../../shared/shared.dart';
+
+import 'package:onlyfeed_frontend/shared/shared.dart';
 
 class ScaffoldWithHeader extends StatefulWidget {
   final Widget body;
@@ -17,6 +18,19 @@ class ScaffoldWithHeader extends StatefulWidget {
 }
 
 class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
+  bool _isAuthenticated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthentication();
+  }
+
+  Future<void> _checkAuthentication() async {
+    final isValid = await TokenManager.isValid();
+    setState(() => _isAuthenticated = isValid);
+  }
+
   void _toggleLocale() {
     final current = context.locale;
     final newLocale = current.languageCode == 'fr' ? Locale('en') : Locale('fr');
@@ -63,10 +77,21 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
                   break;
               }
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'profile', child: Text('user.profile'.tr().capitalize())),
-              PopupMenuItem(value: 'login', child: Text('user.log.login'.tr().capitalize())),
-              PopupMenuItem(value: 'signup', child: Text('user.sign.signup'.tr().capitalize())),
+            itemBuilder: (context) => _isAuthenticated
+            ? [
+              PopupMenuItem(
+                  value: 'profile',
+                  child: Text('user.profile'.tr().capitalize())
+              ),
+            ] : [
+              PopupMenuItem(
+                  value: 'login',
+                  child: Text('user.log.login'.tr().capitalize())
+              ),
+              PopupMenuItem(
+                  value: 'signup',
+                  child: Text('user.sign.signup'.tr().capitalize())
+              ),
             ],
           ),
         ],

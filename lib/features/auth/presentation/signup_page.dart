@@ -1,5 +1,4 @@
 // lib/features/auth/presentation/signup_page.dart
-
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -13,8 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http_parser/http_parser.dart';
 
-import '../../../core/widgets/scaffold_with_header.dart';
-import '../../../shared/shared.dart';
+import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
+import 'package:onlyfeed_frontend/shared/shared.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -33,9 +32,8 @@ class _SignupPageState extends State<SignupPage> {
   String _selectedLanguage = 'fr';
   XFile? _profileImage;
   Uint8List? _webImageBytes;
-  final ImagePicker _picker = ImagePicker();
 
-  final Dio _dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080'));
+  final Dio _dio = DioClient().dio;
 
   void _signup() async {
     final email = _emailCtrl.text.trim();
