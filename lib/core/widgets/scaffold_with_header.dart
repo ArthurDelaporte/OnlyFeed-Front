@@ -51,7 +51,6 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
             child: Text(
               "app.title".tr(),
               style: TextStyle(
-                color: Colors.white,
                 fontSize: 24,
                 fontWeight: FontWeight.bold
               ),
@@ -61,7 +60,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
         actions: [
           TextButton(
             onPressed: _toggleLocale,
-            child: Text(context.locale.languageCode.toUpperCase(), style: TextStyle(color: Colors.white)),
+            child: Text(context.locale.languageCode.toUpperCase(), style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
           ),
           PopupMenuButton<String>(
             onSelected: (value) {

@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:onlyfeed_frontend/features/auth/presentation/login_page.dart';
 import 'package:onlyfeed_frontend/features/auth/presentation/signup_page.dart';
 import 'package:onlyfeed_frontend/features/home/presentation/home_page.dart';
+import 'package:onlyfeed_frontend/features/profile/presentation/profile_page.dart';
 
 class OnlyFeedApp extends StatelessWidget {
   OnlyFeedApp({super.key});
@@ -15,6 +16,7 @@ class OnlyFeedApp extends StatelessWidget {
       GoRoute(path: '/', builder: (context, state) => HomePage()),
       GoRoute(path: '/login', builder: (context, state) => LoginPage()),
       GoRoute(path: '/signup', builder: (context, state) => SignupPage()),
+      GoRoute(path: '/profile', builder: (context, state) => ProfilePage())
     ],
   );
 

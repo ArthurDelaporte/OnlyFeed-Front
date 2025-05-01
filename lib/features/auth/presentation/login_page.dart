@@ -2,7 +2,6 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -20,7 +19,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
-  final Dio _dio = DioClient().dio;
+  final _dio = DioClient().dio;
 
   void _login() async {
     try {
@@ -33,9 +32,10 @@ class _LoginPageState extends State<LoginPage> {
 
       if (response.statusCode == 200) {
         final accessToken = response.data['access_token'];
+        final refreshToken = response.data['refresh_token'];
 
-        if (accessToken != null) {
-          await TokenManager.save(accessToken);
+        if (accessToken != null && refreshToken != null) {
+          await TokenManager.saveBoth(accessToken, refreshToken);
 
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.log.successful".tr())));
           context.go('/');

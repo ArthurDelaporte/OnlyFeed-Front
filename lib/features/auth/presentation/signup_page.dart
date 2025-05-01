@@ -33,7 +33,7 @@ class _SignupPageState extends State<SignupPage> {
   XFile? _profileImage;
   Uint8List? _webImageBytes;
 
-  final Dio _dio = DioClient().dio;
+  final _dio = DioClient().dio;
 
   void _signup() async {
     final email = _emailCtrl.text.trim();
@@ -193,7 +193,7 @@ class _SignupPageState extends State<SignupPage> {
                       ? (_webImageBytes != null ? MemoryImage(_webImageBytes!) : null)
                       : (_profileImage != null ? FileImage(File(_profileImage!.path)) : null) as ImageProvider?,
                   child: _profileImage == null
-                      ? const Icon(Icons.add_a_photo, size: 40, color: Colors.grey)
+                      ? Icon(Icons.add_a_photo, size: 40, color: Colors.grey)
                       : null,
                 ),
               ),

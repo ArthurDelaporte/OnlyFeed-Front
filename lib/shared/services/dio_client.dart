@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:onlyfeed_frontend/shared/services/token_manager.dart';
 
 // Liaison avec backend avec access_token en Authorization Bearer
 class DioClient {
@@ -14,12 +14,24 @@ class DioClient {
       ..interceptors.add(
         InterceptorsWrapper(
           onRequest: (options, handler) async {
-            final prefs = await SharedPreferences.getInstance();
-            final accessToken = prefs.getString('access_token');
+            final accessToken = await TokenManager.getAccessToken();
+            final refreshToken = await TokenManager.getRefreshToken();
+
             if (accessToken != null && accessToken.isNotEmpty) {
               options.headers['Authorization'] = 'Bearer $accessToken';
             }
+            if (refreshToken != null && refreshToken.isNotEmpty) {
+              options.headers['X-Refresh-Token'] = refreshToken;
+            }
+
             return handler.next(options);
+          },
+          onResponse: (response, handler) async {
+            final newAccessToken = response.headers['X-New-Access-Token']?.first;
+            if (newAccessToken != null && newAccessToken.isNotEmpty) {
+              await TokenManager.save(newAccessToken);
+            }
+            return handler.next(response);
           },
         ),
       );
