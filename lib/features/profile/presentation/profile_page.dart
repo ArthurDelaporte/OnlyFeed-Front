@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:go_router/go_router.dart';
 import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 
@@ -41,6 +42,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
+
     return ScaffoldWithHeader(
       body: _user == null
           ? Center(child: CircularProgressIndicator())
@@ -68,7 +71,13 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: 8),
             Text(_user?['Bio'] ?? '', style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
             SizedBox(height: 8),
-            Text("Langue: ${_user?['Language'] ?? ''}", style: TextStyle(fontSize: 14)),
+            Text("${'user.lang.language'.tr().capitalize()}: ${_user?['Language'] ?? ''}", style: TextStyle(fontSize: 14)),
+            SizedBox(height: 8),
+            ElevatedButton.icon(
+              onPressed: () => context.go('/profile/edit'),
+              icon: const Icon(Icons.edit),
+              label: Text("user.edit.edit_profile".tr()),
+            ),
           ],
         ),
       ),

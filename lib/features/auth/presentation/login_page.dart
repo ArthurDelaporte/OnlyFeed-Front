@@ -67,8 +67,17 @@ class _LoginPageState extends State<LoginPage> {
               child: Text("user.log.connection".tr().capitalize(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             ),
             SizedBox(height: 16),
-            TextField(controller: _emailCtrl, decoration: InputDecoration(labelText: 'user.field.email'.tr().capitalize())),
-            TextField(controller: _passwordCtrl, decoration: InputDecoration(labelText: 'user.field.password'.tr().capitalize()), obscureText: true),
+            TextField(
+                controller: _emailCtrl,
+                decoration: InputDecoration(labelText: 'user.field.email'.tr().capitalize())
+            ),
+            TextField(
+                controller: _passwordCtrl,
+                decoration: InputDecoration(labelText: 'user.field.password'.tr().capitalize()),
+                obscureText: true,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => _login()
+            ),
             SizedBox(height: 20),
             ElevatedButton(onPressed: _login, child: Text('user.log.login'.tr().capitalize())),
             SizedBox(height: 20),

@@ -36,9 +36,18 @@
     "log": {
       "login": "se connecter",
       "connection": "connexion",
+      "logout": "se déconnecter",
+      "logout_failed": "Échec de la déconnexion",
       "successful": "Connexion réussie",
       "error": "Erreur de connexion",
       "no_account": "Pas encore de compte ? S'inscrire"
+    },
+    "edit": {
+      "register": "enregistrer",
+      "edit_profile": "Modifier votre profil",
+      "no_update": "Aucune modification détectée",
+      "updated_success": "Profil mis à jour",
+      "update_failed": "Échec de la mise à jour"
     }
   }
 }

@@ -1,4 +1,5 @@
 // lib/core/widgets/scaffold_with_header.dart
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -19,28 +20,70 @@ class ScaffoldWithHeader extends StatefulWidget {
 
 class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
   bool _isAuthenticated = false;
+  bool _hasCheckedAuth = false;
 
   @override
-  void initState() {
-    super.initState();
-    _checkAuthentication();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasCheckedAuth) {
+      _hasCheckedAuth = true;
+      _checkAuthentication();
+    }
   }
 
   Future<void> _checkAuthentication() async {
     final isValid = await TokenManager.isValid();
-    setState(() => _isAuthenticated = isValid);
+    if (isValid) {
+      final dio = DioClient().dio;
+      try {
+        final response = await dio.get('/api/me');
+        final language = response.data['user']['Language'];
+        if (language != null && context.locale.languageCode != language) {
+          await context.setLocale(Locale(language));
+        }
+      } catch (_) {}
+    }
+
+    if (mounted) {
+      setState(() => _isAuthenticated = isValid);
+    }
   }
 
-  void _toggleLocale() {
+  Future<void> _toggleLocale() async {
     final current = context.locale;
     final newLocale = current.languageCode == 'fr' ? Locale('en') : Locale('fr');
     context.setLocale(newLocale);
     setState(() {});
   }
 
+  Future<void> _logout() async {
+    try {
+      final dio = DioClient().dio;
+      final response = await dio.post('/api/auth/logout');
+
+      if (response.data['message'] != null) {
+        await TokenManager.clear();
+        if (mounted) context.go('/');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("user.log.logout_failed".tr())),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("${"core.error".tr()} : $e")),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
+    if (!_hasCheckedAuth) {
+      _hasCheckedAuth = true;
+      _checkAuthentication();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -63,10 +106,13 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
             child: Text(context.locale.languageCode.toUpperCase(), style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
           ),
           PopupMenuButton<String>(
-            onSelected: (value) {
+            onSelected: (value) async {
               switch (value) {
                 case 'profile':
                   context.go('/profile');
+                  break;
+                case 'logout':
+                  await _logout();
                   break;
                 case 'login':
                   context.go('/login');
@@ -81,6 +127,10 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
               PopupMenuItem(
                   value: 'profile',
                   child: Text('user.profile'.tr().capitalize())
+              ),
+              PopupMenuItem(
+                value: 'logout',
+                child: Text('user.log.logout'.tr().capitalize()),
               ),
             ] : [
               PopupMenuItem(

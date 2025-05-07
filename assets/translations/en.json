@@ -36,9 +36,18 @@
     "log": {
       "login": "login",
       "connection": "connection",
+      "logout": "log out",
+      "logout_failed": "Logout failed",
       "successful": "Successful connection",
       "error": "Connection error",
       "no_account": "Don't have an account yet? Sign in"
+    },
+    "edit": {
+      "register": "register",
+      "edit_profile": "Modify your profile",
+      "no_update": "No changes detected",
+      "updated_success": "Updated profile",
+      "update_failed": "Update failed"
     }
   }
 }

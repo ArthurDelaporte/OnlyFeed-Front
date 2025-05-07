@@ -51,6 +51,13 @@ class _SignupPageState extends State<SignupPage> {
       return;
     }
 
+    if (!Validators.isValidEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Adresse email invalide")),
+      );
+      return;
+    }
+
     // Vérification de la langue
     if (!['fr', 'en'].contains(_selectedLanguage)) {
       ScaffoldMessenger.of(context).showSnackBar(
