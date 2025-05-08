@@ -51,8 +51,26 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
 
   Future<void> _toggleLocale() async {
     final current = context.locale;
-    final newLocale = current.languageCode == 'fr' ? Locale('en') : Locale('fr');
-    context.setLocale(newLocale);
+    final newLocale = current.languageCode == 'fr' ? const Locale('en') : const Locale('fr');
+    await context.setLocale(newLocale);
+
+    if (_isAuthenticated) {
+      try {
+        final dio = DioClient().dio;
+        await dio.put(
+          '/api/me',
+          data: FormData.fromMap({
+            'language': newLocale.languageCode,
+          }),
+          options: Options(contentType: 'multipart/form-data'),
+        );
+      } catch (_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("core.error".tr())),
+        );
+      }
+    }
+
     setState(() {});
   }
 

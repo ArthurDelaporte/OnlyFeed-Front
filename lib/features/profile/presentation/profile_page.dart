@@ -71,7 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: 8),
             Text(_user?['Bio'] ?? '', style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
             SizedBox(height: 8),
-            Text("${'user.lang.language'.tr().capitalize()}: ${_user?['Language'] ?? ''}", style: TextStyle(fontSize: 14)),
+            Text("${'user.lang.language'.tr().capitalize()}: ${('user.lang.'+currentLocale.languageCode).tr().capitalize()}", style: TextStyle(fontSize: 14)),
             SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: () => context.go('/profile/edit'),

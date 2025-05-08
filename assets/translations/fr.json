@@ -22,7 +22,9 @@
     "lang": {
       "language": "langue",
       "french": "français",
+      "fr": "français",
       "english": "anglais",
+      "en": "anglais",
       "invalid": "Langue invalide. Choisissez 'fr' ou 'en'."
     },
     "sign": {
