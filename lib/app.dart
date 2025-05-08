@@ -7,6 +7,7 @@ import 'package:onlyfeed_frontend/features/auth/presentation/signup_page.dart';
 import 'package:onlyfeed_frontend/features/home/presentation/home_page.dart';
 import 'package:onlyfeed_frontend/features/profile/presentation/profile_page.dart';
 import 'package:onlyfeed_frontend/features/profile/presentation/edit_profile_page.dart';
+import 'package:onlyfeed_frontend/features/profile/presentation/public_profile_page.dart';
 
 class OnlyFeedApp extends StatelessWidget {
   OnlyFeedApp({super.key});
@@ -18,7 +19,14 @@ class OnlyFeedApp extends StatelessWidget {
       GoRoute(path: '/login', builder: (context, state) => LoginPage()),
       GoRoute(path: '/signup', builder: (context, state) => SignupPage()),
       GoRoute(path: '/profile', builder: (context, state) => ProfilePage()),
-      GoRoute(path: '/profile/edit', builder: (context, state) => EditProfilePage())
+      GoRoute(path: '/profile/edit', builder: (context, state) => EditProfilePage()),
+      GoRoute(
+        path: '/user/:username',
+        builder: (context, state) {
+          final username = state.pathParameters['username']!;
+          return PublicProfilePage(username: username);
+        },
+      ),
     ],
   );
 

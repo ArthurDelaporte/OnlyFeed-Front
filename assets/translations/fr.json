@@ -8,6 +8,7 @@
   },
   "user": {
     "profile": "profil",
+    "not_found": "Utilisateur introuvable",
     "field": {
       "email": "email",
       "password": "mot de passe",

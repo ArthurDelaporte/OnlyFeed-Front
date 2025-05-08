@@ -8,6 +8,7 @@
   },
   "user": {
     "profile": "profile",
+    "not_found": "User not found",
     "field": {
       "email": "email",
       "password": "password",
