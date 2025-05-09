@@ -3,8 +3,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:onlyfeed_frontend/shared/notifiers/theme_notifier.dart';
 
 import 'package:onlyfeed_frontend/shared/shared.dart';
+import 'package:provider/provider.dart';
 
 class ScaffoldWithHeader extends StatefulWidget {
   final Widget body;
@@ -50,9 +52,9 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
   }
 
   Future<void> _toggleLocale() async {
-    final current = context.locale;
-    final newLocale = current.languageCode == 'fr' ? const Locale('en') : const Locale('fr');
-    await context.setLocale(newLocale);
+    final newLocale = context.locale.languageCode == 'fr' ? const Locale('en') : const Locale('fr');
+
+    context.setLocale(newLocale);
 
     if (_isAuthenticated) {
       try {
@@ -66,7 +68,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
         );
       } catch (_) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("core.error".tr())),
+          SnackBar(content: Text(context.tr("core.error"))),
         );
       }
     }
@@ -84,12 +86,12 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
         if (mounted) context.go('/');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("user.log.logout_failed".tr())),
+          SnackBar(content: Text(context.tr("user.log.logout_failed"))),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("${"core.error".tr()} : $e")),
+        SnackBar(content: Text("${context.tr("core.error")} : $e")),
       );
     }
   }
@@ -97,11 +99,11 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
 
   @override
   Widget build(BuildContext context) {
-    final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
     if (!_hasCheckedAuth) {
       _hasCheckedAuth = true;
       _checkAuthentication();
     }
+
 
     return Scaffold(
       appBar: AppBar(
@@ -110,7 +112,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
           child: GestureDetector(
             onTap: () => context.go('/'),
             child: Text(
-              "app.title".tr(),
+            context.tr("app.title"),
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold
@@ -144,20 +146,20 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
             ? [
               PopupMenuItem(
                   value: 'profile',
-                  child: Text('user.profile'.tr().capitalize())
+                  child: Text(context.tr('user.profile').capitalize())
               ),
               PopupMenuItem(
                 value: 'logout',
-                child: Text('user.log.logout'.tr().capitalize()),
+                child: Text(context.tr('user.log.logout').capitalize()),
               ),
             ] : [
               PopupMenuItem(
                   value: 'login',
-                  child: Text('user.log.login'.tr().capitalize())
+                  child: Text(context.tr('user.log.login').capitalize())
               ),
               PopupMenuItem(
                   value: 'signup',
-                  child: Text('user.sign.signup'.tr().capitalize())
+                  child: Text(context.tr('user.sign.signup').capitalize())
               ),
             ],
           ),

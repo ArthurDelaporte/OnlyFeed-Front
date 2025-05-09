@@ -34,20 +34,20 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("core.error".tr())),
+        SnackBar(content: Text(context.tr("core.error"))),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
+    // final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
 
     return ScaffoldWithHeader(
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _user == null
-          ? Center(child: Text("user.not_found".tr()))
+          ? Center(child: Text(context.tr("user.not_found")))
           : Padding(
         padding: EdgeInsets.all(24),
         child: Column(

@@ -30,19 +30,19 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() => _user = response.data['user']);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("core.error".tr())),
+          SnackBar(content: Text(context.tr("core.error"))),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("${"core.error".tr()} : $e")),
+        SnackBar(content: Text("${context.tr("core.error")} : $e")),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
+    // final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
 
     return ScaffoldWithHeader(
       body: _user == null
@@ -52,10 +52,10 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (_user?['AvatarURL'] != null)
+            if (_user?['avatar_url'] != null)
               CircleAvatar(
                 radius: 50,
-                backgroundImage: NetworkImage(_user!['AvatarURL']),
+                backgroundImage: NetworkImage(_user!['avatar_url']),
               )
             else
               CircleAvatar(
@@ -63,20 +63,20 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Icon(Icons.person, size: 40),
               ),
             SizedBox(height: 20),
-            Text(_user?['Username'] ?? '', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text(_user?['username'] ?? '', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
-            Text(_user?['Email'] ?? '', style: TextStyle(fontSize: 16)),
+            Text(_user?['email'] ?? '', style: TextStyle(fontSize: 16)),
             SizedBox(height: 8),
-            Text("${_user?['Firstname'] ?? ''} ${_user?['Lastname'] ?? ''}", style: TextStyle(fontSize: 16)),
+            Text("${_user?['firstname'] ?? ''} ${_user?['lastname'] ?? ''}", style: TextStyle(fontSize: 16)),
             SizedBox(height: 8),
-            Text(_user?['Bio'] ?? '', style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
+            Text(_user?['bio'] ?? '', style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
             SizedBox(height: 8),
-            Text("${'user.lang.language'.tr().capitalize()}: ${('user.lang.'+currentLocale.languageCode).tr().capitalize()}", style: TextStyle(fontSize: 14)),
+            Text("${context.tr('user.lang.language').capitalize()}: ${('user.lang.'+context.locale.languageCode).tr().capitalize()}", style: TextStyle(fontSize: 14)),
             SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: () => context.go('/profile/edit'),
               icon: const Icon(Icons.edit),
-              label: Text("user.edit.edit_profile".tr()),
+              label: Text(context.tr("user.edit.edit_profile")),
             ),
           ],
         ),

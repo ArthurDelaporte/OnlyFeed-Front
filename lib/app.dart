@@ -8,6 +8,8 @@ import 'package:onlyfeed_frontend/features/home/presentation/home_page.dart';
 import 'package:onlyfeed_frontend/features/profile/presentation/profile_page.dart';
 import 'package:onlyfeed_frontend/features/profile/presentation/edit_profile_page.dart';
 import 'package:onlyfeed_frontend/features/profile/presentation/public_profile_page.dart';
+import 'package:onlyfeed_frontend/shared/notifiers/theme_notifier.dart';
+import 'package:provider/provider.dart';
 
 class OnlyFeedApp extends StatelessWidget {
   OnlyFeedApp({super.key});
@@ -18,6 +20,14 @@ class OnlyFeedApp extends StatelessWidget {
       GoRoute(path: '/', builder: (context, state) => HomePage()),
       GoRoute(path: '/login', builder: (context, state) => LoginPage()),
       GoRoute(path: '/signup', builder: (context, state) => SignupPage()),
+      // GoRoute(path: '/profile', builder: (context, state) => ProfilePage(), redirect: (context, state){
+      //   bool isConnected = false;
+      //   if(isConnected){
+      //     return null;
+      //   }
+      //
+      //   return '/login';
+      // }),
       GoRoute(path: '/profile', builder: (context, state) => ProfilePage()),
       GoRoute(path: '/profile/edit', builder: (context, state) => EditProfilePage()),
       GoRoute(
@@ -32,6 +42,7 @@ class OnlyFeedApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp.router(
       locale: context.locale,
       supportedLocales: context.supportedLocales,

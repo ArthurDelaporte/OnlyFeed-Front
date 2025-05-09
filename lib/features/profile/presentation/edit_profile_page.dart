@@ -47,11 +47,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final user = response.data['user'];
 
       _initialValues = {
-        'username': user['Username'] ?? '',
-        'firstname': user['Firstname'] ?? '',
-        'lastname': user['Lastname'] ?? '',
-        'bio': user['Bio'] ?? '',
-        'avatar': user['AvatarURL'] ?? '',
+        'username': user['username'] ?? '',
+        'firstname': user['firstname'] ?? '',
+        'lastname': user['lastname'] ?? '',
+        'bio': user['bio'] ?? '',
+        'avatar': user['avatar_url'] ?? '',
       };
 
       setState(() {
@@ -64,7 +64,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("core.error".tr())),
+        SnackBar(content: Text(context.tr("core.error"))),
       );
     }
   }
@@ -117,7 +117,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (formData.fields.isEmpty && formData.files.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("user.edit.no_update".tr().capitalize())),
+          SnackBar(content: Text(context.tr("user.edit.no_update").capitalize())),
       );
       return;
     }
@@ -131,24 +131,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("user.edit.updated_success".tr())),
+          SnackBar(content: Text(context.tr("user.edit.updated_success"))),
         );
         context.go('/profile');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("user.edit.update_failed".tr())),
+          SnackBar(content: Text(context.tr("user.edit.update_failed"))),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("${"core.error".tr().capitalize()} : $e")),
+        SnackBar(content: Text("${context.tr("core.error").capitalize()} : $e")),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
+    // final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
 
     if (_isLoading) {
       return ScaffoldWithHeader(body: Center(child: CircularProgressIndicator()));
@@ -166,12 +166,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
       body: Center(
         child: ListView(
           children: [
-            Text("user.edit.edit_profile".tr(), style: Theme.of(context).textTheme.titleLarge),
+            Text(context.tr("user.edit.edit_profile"), style: Theme.of(context).textTheme.titleLarge),
             SizedBox(height: 16),
-            TextField(controller: _usernameCtrl, decoration: InputDecoration(labelText: 'user.field.username'.tr().capitalize())),
-            TextField(controller: _firstnameCtrl, decoration: InputDecoration(labelText: 'user.field.firstname'.tr().capitalize())),
-            TextField(controller: _lastnameCtrl, decoration: InputDecoration(labelText: 'user.field.lastname'.tr().capitalize())),
-            TextField(controller: _bioCtrl, decoration: InputDecoration(labelText: 'user.field.bio'.tr().capitalize())),
+            TextField(controller: _usernameCtrl, decoration: InputDecoration(labelText: context.tr('user.field.username').capitalize())),
+            TextField(controller: _firstnameCtrl, decoration: InputDecoration(labelText: context.tr('user.field.firstname').capitalize())),
+            TextField(controller: _lastnameCtrl, decoration: InputDecoration(labelText: context.tr('user.field.lastname').capitalize())),
+            TextField(controller: _bioCtrl, decoration: InputDecoration(labelText: context.tr('user.field.bio').capitalize())),
             SizedBox(height: 16),
             Center(
               child: GestureDetector(
@@ -187,7 +187,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
             ),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: _saveProfile, child: Text("user.edit.register".tr().capitalize())),
+            ElevatedButton(onPressed: _saveProfile, child: Text(context.tr("user.edit.register").capitalize())),
           ],
         ),
       ),

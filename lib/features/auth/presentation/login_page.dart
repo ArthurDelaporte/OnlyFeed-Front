@@ -37,16 +37,16 @@ class _LoginPageState extends State<LoginPage> {
         if (accessToken != null && refreshToken != null) {
           await TokenManager.saveBoth(accessToken, refreshToken);
 
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.log.successful".tr())));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr("user.log.successful"))));
           context.go('/');
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("core.error".tr())));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr("core.error"))));
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.log.error".tr())));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr("user.log.error"))));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${"core.error".tr()} : $e")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${context.tr("core.error")} : $e")));
     }
   }
 
@@ -56,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
+    // final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
 
     return ScaffoldWithHeader(
       body: Padding(
@@ -64,24 +64,24 @@ class _LoginPageState extends State<LoginPage> {
         child: ListView(
           children: [
             Center(
-              child: Text("user.log.connection".tr().capitalize(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              child: Text(context.tr("user.log.connection").capitalize(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             ),
             SizedBox(height: 16),
             TextField(
                 controller: _emailCtrl,
-                decoration: InputDecoration(labelText: 'user.field.email'.tr().capitalize())
+                decoration: InputDecoration(labelText: context.tr('user.field.email').capitalize())
             ),
             TextField(
                 controller: _passwordCtrl,
-                decoration: InputDecoration(labelText: 'user.field.password'.tr().capitalize()),
+                decoration: InputDecoration(labelText: context.tr('user.field.password').capitalize()),
                 obscureText: true,
                 textInputAction: TextInputAction.done,
                 onSubmitted: (_) => _login()
             ),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: _login, child: Text('user.log.login'.tr().capitalize())),
+            ElevatedButton(onPressed: _login, child: Text(context.tr('user.log.login').capitalize())),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: goToSignup, child: Text('user.log.no_account'.tr())),
+            ElevatedButton(onPressed: goToSignup, child: Text(context.tr('user.log.no_account'))),
           ],
         ),
       ),

@@ -9,11 +9,9 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
-
     return ScaffoldWithHeader(
       body: Center(
-        child: Text('app.welcome'.tr()),
+        child: Text(context.tr('app.welcome')),
       ),
     );
   }
