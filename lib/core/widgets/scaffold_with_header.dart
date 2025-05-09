@@ -3,10 +3,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:onlyfeed_frontend/shared/notifiers/theme_notifier.dart';
+import 'package:provider/provider.dart';
 
 import 'package:onlyfeed_frontend/shared/shared.dart';
-import 'package:provider/provider.dart';
 
 class ScaffoldWithHeader extends StatefulWidget {
   final Widget body;
@@ -39,9 +38,13 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
       final dio = DioClient().dio;
       try {
         final response = await dio.get('/api/me');
-        final language = response.data['user']['Language'];
-        if (language != null && context.locale.languageCode != language) {
-          await context.setLocale(Locale(language));
+        final language = response.data['user']['language'];
+        final currentLocale = context.locale;
+
+        if (language != null && currentLocale.languageCode != language) {
+          final newLocale = Locale(language);
+          await context.setLocale(newLocale);
+          context.read<LocaleNotifier>().setLocale(newLocale);
         }
       } catch (_) {}
     }
@@ -52,9 +55,11 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
   }
 
   Future<void> _toggleLocale() async {
-    final newLocale = context.locale.languageCode == 'fr' ? const Locale('en') : const Locale('fr');
+    final current = context.read<LocaleNotifier>().locale;
+    final newLocale = current.languageCode == 'fr' ? const Locale('en') : const Locale('fr');
 
-    context.setLocale(newLocale);
+    await context.setLocale(newLocale);
+    context.read<LocaleNotifier>().setLocale(newLocale);
 
     if (_isAuthenticated) {
       try {
@@ -68,7 +73,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
         );
       } catch (_) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.tr("core.error"))),
+          SnackBar(content: Text("core.error".tr())),
         );
       }
     }
@@ -86,12 +91,12 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
         if (mounted) context.go('/');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.tr("user.log.logout_failed"))),
+          SnackBar(content: Text("user.log.logout_failed".tr())),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("${context.tr("core.error")} : $e")),
+        SnackBar(content: Text("${"core.error".tr()} : $e")),
       );
     }
   }
@@ -99,11 +104,12 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
 
   @override
   Widget build(BuildContext context) {
+    final locale = context.watch<LocaleNotifier>().locale;
+
     if (!_hasCheckedAuth) {
       _hasCheckedAuth = true;
       _checkAuthentication();
     }
-
 
     return Scaffold(
       appBar: AppBar(
@@ -112,7 +118,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
           child: GestureDetector(
             onTap: () => context.go('/'),
             child: Text(
-            context.tr("app.title"),
+            "app.title".tr(),
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold
@@ -123,7 +129,9 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
         actions: [
           TextButton(
             onPressed: _toggleLocale,
-            child: Text(context.locale.languageCode.toUpperCase(), style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+            child: Text(
+                locale.languageCode.toUpperCase(),
+                style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
           ),
           PopupMenuButton<String>(
             onSelected: (value) async {
@@ -146,20 +154,20 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
             ? [
               PopupMenuItem(
                   value: 'profile',
-                  child: Text(context.tr('user.profile').capitalize())
+                  child: Text('user.profile'.tr().capitalize())
               ),
               PopupMenuItem(
                 value: 'logout',
-                child: Text(context.tr('user.log.logout').capitalize()),
+                child: Text('user.log.logout'.tr().capitalize()),
               ),
             ] : [
               PopupMenuItem(
                   value: 'login',
-                  child: Text(context.tr('user.log.login').capitalize())
+                  child: Text('user.log.login'.tr().capitalize())
               ),
               PopupMenuItem(
                   value: 'signup',
-                  child: Text(context.tr('user.sign.signup').capitalize())
+                  child: Text('user.sign.signup'.tr().capitalize())
               ),
             ],
           ),

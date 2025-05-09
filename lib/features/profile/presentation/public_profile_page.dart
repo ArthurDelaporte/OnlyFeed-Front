@@ -1,6 +1,8 @@
 // lib/features/profile/presentation/public_profile_page.dart
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
+
 import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 
@@ -34,20 +36,20 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.tr("core.error"))),
+        SnackBar(content: Text("core.error".tr())),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
+    final locale = context.watch<LocaleNotifier>().locale;
 
     return ScaffoldWithHeader(
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _user == null
-          ? Center(child: Text(context.tr("user.not_found")))
+          ? Center(child: Text("user.not_found".tr()))
           : Padding(
         padding: EdgeInsets.all(24),
         child: Column(

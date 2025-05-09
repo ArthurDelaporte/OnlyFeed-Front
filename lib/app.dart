@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 import 'package:onlyfeed_frontend/features/auth/presentation/login_page.dart';
 import 'package:onlyfeed_frontend/features/auth/presentation/signup_page.dart';
@@ -8,13 +6,9 @@ import 'package:onlyfeed_frontend/features/home/presentation/home_page.dart';
 import 'package:onlyfeed_frontend/features/profile/presentation/profile_page.dart';
 import 'package:onlyfeed_frontend/features/profile/presentation/edit_profile_page.dart';
 import 'package:onlyfeed_frontend/features/profile/presentation/public_profile_page.dart';
-import 'package:onlyfeed_frontend/shared/notifiers/theme_notifier.dart';
-import 'package:provider/provider.dart';
 
-class OnlyFeedApp extends StatelessWidget {
-  OnlyFeedApp({super.key});
-
-  final _router = GoRouter(
+class OnlyFeedApp {
+  static final router = GoRouter(
     initialLocation: '/',
     routes: [
       GoRoute(path: '/', builder: (context, state) => HomePage()),
@@ -39,19 +33,4 @@ class OnlyFeedApp extends StatelessWidget {
       ),
     ],
   );
-
-  @override
-  Widget build(BuildContext context) {
-
-    return MaterialApp.router(
-      locale: context.locale,
-      supportedLocales: context.supportedLocales,
-      localizationsDelegates: context.localizationDelegates,
-      debugShowCheckedModeBanner: false,
-      routerConfig: _router,
-      title: 'OnlyFeed',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-    );
-  }
 }

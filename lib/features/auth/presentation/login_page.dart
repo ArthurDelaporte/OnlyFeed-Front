@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import 'package:onlyfeed_frontend/shared/shared.dart';
 import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
@@ -37,16 +38,16 @@ class _LoginPageState extends State<LoginPage> {
         if (accessToken != null && refreshToken != null) {
           await TokenManager.saveBoth(accessToken, refreshToken);
 
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr("user.log.successful"))));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.log.successful".tr())));
           context.go('/');
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr("core.error"))));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("core.error".tr())));
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr("user.log.error"))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.log.error".tr())));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${context.tr("core.error")} : $e")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${"core.error".tr()} : $e")));
     }
   }
 
@@ -56,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
+    final locale = context.watch<LocaleNotifier>().locale;
 
     return ScaffoldWithHeader(
       body: Padding(
@@ -64,24 +65,24 @@ class _LoginPageState extends State<LoginPage> {
         child: ListView(
           children: [
             Center(
-              child: Text(context.tr("user.log.connection").capitalize(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              child: Text("user.log.connection".tr().capitalize(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             ),
             SizedBox(height: 16),
             TextField(
                 controller: _emailCtrl,
-                decoration: InputDecoration(labelText: context.tr('user.field.email').capitalize())
+                decoration: InputDecoration(labelText: 'user.field.email'.tr().capitalize())
             ),
             TextField(
                 controller: _passwordCtrl,
-                decoration: InputDecoration(labelText: context.tr('user.field.password').capitalize()),
+                decoration: InputDecoration(labelText: 'user.field.password'.tr().capitalize()),
                 obscureText: true,
                 textInputAction: TextInputAction.done,
                 onSubmitted: (_) => _login()
             ),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: _login, child: Text(context.tr('user.log.login').capitalize())),
+            ElevatedButton(onPressed: _login, child: Text('user.log.login'.tr().capitalize())),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: goToSignup, child: Text(context.tr('user.log.no_account'))),
+            ElevatedButton(onPressed: goToSignup, child: Text('user.log.no_account'.tr())),
           ],
         ),
       ),

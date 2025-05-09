@@ -11,6 +11,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:provider/provider.dart';
 
 import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
@@ -46,7 +47,7 @@ class _SignupPageState extends State<SignupPage> {
     // Validation des champs requis
     if (email.isEmpty || password.isEmpty || username.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.tr("user.field.invalid"))),
+        SnackBar(content: Text("user.field.invalid".tr())),
       );
       return;
     }
@@ -61,7 +62,7 @@ class _SignupPageState extends State<SignupPage> {
     // Vérification de la langue
     if (!['fr', 'en'].contains(_selectedLanguage)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.tr("user.lang.invalid"))),
+        SnackBar(content: Text("user.lang.invalid".tr())),
       );
       return;
     }
@@ -72,7 +73,7 @@ class _SignupPageState extends State<SignupPage> {
       final isValidExtension = RegExp(r'\.(jpg|jpeg|png|webp|gif|heic)$').hasMatch(fileName);
       if (!isValidExtension) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.tr("user.field.profile_picture_invalid"))),
+          SnackBar(content: Text("user.field.profile_picture_invalid".tr())),
         );
         return;
       }
@@ -121,13 +122,13 @@ class _SignupPageState extends State<SignupPage> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr("user.sign.successful"))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.sign.successful".tr())));
         context.go('/login');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr("user.sign.error"))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.sign.error".tr())));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${context.tr("core.error")} : $e")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${"core.error".tr()} : $e")));
     }
   }
 
@@ -156,7 +157,7 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    // final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
+    final locale = context.watch<LocaleNotifier>().locale;
 
     return ScaffoldWithHeader(
       body: Padding(
@@ -164,22 +165,22 @@ class _SignupPageState extends State<SignupPage> {
         child: ListView(
           children: [
             Center(
-              child: Text(context.tr('user.sign.registration').capitalize(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              child: Text('user.sign.registration'.tr().capitalize(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             ),
             SizedBox(height: 16),
-            TextField(controller: _emailCtrl, decoration: InputDecoration(labelText: context.tr('user.field.email').capitalize())),
-            TextField(controller: _passwordCtrl, decoration: InputDecoration(labelText: context.tr('user.field.password').capitalize()), obscureText: true),
-            TextField(controller: _usernameCtrl, decoration: InputDecoration(labelText: context.tr('user.field.username').capitalize())),
-            TextField(controller: _firstnameCtrl, decoration: InputDecoration(labelText: context.tr('user.field.firstname').capitalize())),
-            TextField(controller: _lastnameCtrl, decoration: InputDecoration(labelText: context.tr('user.field.lastname').capitalize())),
-            TextField(controller: _bioCtrl, decoration: InputDecoration(labelText: context.tr('user.field.bio').capitalize())),
+            TextField(controller: _emailCtrl, decoration: InputDecoration(labelText: 'user.field.email'.tr().capitalize())),
+            TextField(controller: _passwordCtrl, decoration: InputDecoration(labelText: 'user.field.password'.tr().capitalize()), obscureText: true),
+            TextField(controller: _usernameCtrl, decoration: InputDecoration(labelText: 'user.field.username'.tr().capitalize())),
+            TextField(controller: _firstnameCtrl, decoration: InputDecoration(labelText: 'user.field.firstname'.tr().capitalize())),
+            TextField(controller: _lastnameCtrl, decoration: InputDecoration(labelText: 'user.field.lastname'.tr().capitalize())),
+            TextField(controller: _bioCtrl, decoration: InputDecoration(labelText: 'user.field.bio'.tr().capitalize())),
             SizedBox(height: 16),
             DropdownButtonFormField<String>(
               value: _selectedLanguage,
-              decoration: InputDecoration(labelText: context.tr('user.lang.language').capitalize()),
+              decoration: InputDecoration(labelText: 'user.lang.language'.tr().capitalize()),
               items: [
-                DropdownMenuItem(value: 'fr', child: Text(context.tr('user.lang.french').capitalize())),
-                DropdownMenuItem(value: 'en', child: Text(context.tr('user.lang.english').capitalize())),
+                DropdownMenuItem(value: 'fr', child: Text('user.lang.french'.tr().capitalize())),
+                DropdownMenuItem(value: 'en', child: Text('user.lang.english'.tr().capitalize())),
               ],
               onChanged: (value) {
                 if (value != null) {
@@ -206,11 +207,11 @@ class _SignupPageState extends State<SignupPage> {
               ),
             ),
             SizedBox(height: 12),
-            Text(context.tr('user.field.profile_picture').capitalize()),
+            Text('user.field.profile_picture'.tr().capitalize()),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: _signup, child: Text(context.tr('user.sign.register').capitalize())),
+            ElevatedButton(onPressed: _signup, child: Text('user.sign.register'.tr().capitalize())),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: goToLogin, child: Text(context.tr('user.sign.already_account'))),
+            ElevatedButton(onPressed: goToLogin, child: Text('user.sign.already_account'.tr())),
           ],
         ),
       ),

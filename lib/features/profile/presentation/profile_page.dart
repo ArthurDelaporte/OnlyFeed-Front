@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
 import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 
@@ -30,19 +32,19 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() => _user = response.data['user']);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.tr("core.error"))),
+          SnackBar(content: Text("core.error".tr())),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("${context.tr("core.error")} : $e")),
+        SnackBar(content: Text("${"core.error".tr()} : $e")),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
+    final locale = context.watch<LocaleNotifier>().locale;
 
     return ScaffoldWithHeader(
       body: _user == null
@@ -71,12 +73,12 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: 8),
             Text(_user?['bio'] ?? '', style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
             SizedBox(height: 8),
-            Text("${context.tr('user.lang.language').capitalize()}: ${('user.lang.'+context.locale.languageCode).tr().capitalize()}", style: TextStyle(fontSize: 14)),
+            Text("${'user.lang.language'.tr().capitalize()}: ${('user.lang.'+context.locale.languageCode).tr().capitalize()}", style: TextStyle(fontSize: 14)),
             SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: () => context.go('/profile/edit'),
               icon: const Icon(Icons.edit),
-              label: Text(context.tr("user.edit.edit_profile")),
+              label: Text("user.edit.edit_profile".tr()),
             ),
           ],
         ),
