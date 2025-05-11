@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:onlyfeed_frontend/app.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
+import 'package:onlyfeed_frontend/shared/utils/platform/web_event_listener.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +24,7 @@ void main() async {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => LocaleNotifier()),
+          ChangeNotifierProvider(create: (_) => SessionNotifier()),
         ],
         child: MyApp(),
       ),
@@ -30,7 +32,24 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+
+    // 🔄 Web only: listen to changes from other tabs
+    setupWebStorageListener(() {
+      context.read<SessionNotifier>().refreshUser();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleNotifier>().locale;

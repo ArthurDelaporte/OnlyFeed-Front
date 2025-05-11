@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'token_storage.dart';
 
 class TokenManager {
   static const _accessTokenKey = 'access_token';
@@ -14,6 +15,8 @@ class TokenManager {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_accessTokenKey, accessToken);
     await prefs.setString(_refreshTokenKey, refreshToken);
+
+    await syncToWebStorage(accessToken, refreshToken);
   }
 
   static Future<String?> getAccessToken() async {
@@ -30,6 +33,8 @@ class TokenManager {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_accessTokenKey);
     await prefs.remove(_refreshTokenKey);
+
+    await clearWebStorage();
   }
 
   static Future<bool> isValid() async {

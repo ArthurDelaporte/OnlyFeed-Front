@@ -19,49 +19,67 @@ class ScaffoldWithHeader extends StatefulWidget {
   State<ScaffoldWithHeader> createState() => _ScaffoldWithHeaderState();
 }
 
-class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
-  bool _isAuthenticated = false;
-  bool _hasCheckedAuth = false;
+class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader> with WidgetsBindingObserver{
+  bool _hasCheckedSession = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context.read<SessionNotifier>().refreshUser();
+    }
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_hasCheckedAuth) {
-      _hasCheckedAuth = true;
-      _checkAuthentication();
+    if (!_hasCheckedSession) {
+      _hasCheckedSession = true;
+      _loadSessionUser();
     }
   }
 
-  Future<void> _checkAuthentication() async {
-    final isValid = await TokenManager.isValid();
-    if (isValid) {
-      final dio = DioClient().dio;
-      try {
-        final response = await dio.get('/api/me');
-        final language = response.data['user']['language'];
-        final currentLocale = context.locale;
+  Future<void> _loadSessionUser() async {
+    final session = context.read<SessionNotifier>();
+    if (!session.isAuthenticated) {
+      final isValid = await TokenManager.isValid();
+      if (isValid) {
+        try {
+          final dio = DioClient().dio;
+          final response = await dio.get('/api/me');
+          final user = response.data['user'];
+          session.setUser(user);
 
-        if (language != null && currentLocale.languageCode != language) {
-          final newLocale = Locale(language);
-          await context.setLocale(newLocale);
-          context.read<LocaleNotifier>().setLocale(newLocale);
-        }
-      } catch (_) {}
-    }
-
-    if (mounted) {
-      setState(() => _isAuthenticated = isValid);
+          final language = user['language'];
+          final locale = context.read<LocaleNotifier>();
+          if (language != null && locale.locale.languageCode != language) {
+            locale.setLocale(Locale(language));
+          }
+        } catch (_) {}
+      }
     }
   }
 
   Future<void> _toggleLocale() async {
-    final current = context.read<LocaleNotifier>().locale;
-    final newLocale = current.languageCode == 'fr' ? const Locale('en') : const Locale('fr');
+    final session = context.read<SessionNotifier>();
+    final locale = context.read<LocaleNotifier>();
+    final newLocale = locale.locale.languageCode == 'fr' ? const Locale('en') : const Locale('fr');
 
     await context.setLocale(newLocale);
-    context.read<LocaleNotifier>().setLocale(newLocale);
+    locale.setLocale(newLocale);
 
-    if (_isAuthenticated) {
+    if (session.isAuthenticated) {
       try {
         final dio = DioClient().dio;
         await dio.put(
@@ -88,6 +106,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
 
       if (response.data['message'] != null) {
         await TokenManager.clear();
+        context.read<SessionNotifier>().clearUser();
         if (mounted) context.go('/');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -101,15 +120,11 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleNotifier>().locale;
-
-    if (!_hasCheckedAuth) {
-      _hasCheckedAuth = true;
-      _checkAuthentication();
-    }
+    final session = context.watch<SessionNotifier>();
+    final isAuthenticated = session.isAuthenticated;
 
     return Scaffold(
       appBar: AppBar(
@@ -118,7 +133,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
           child: GestureDetector(
             onTap: () => context.go('/'),
             child: Text(
-            "app.title".tr(),
+              "app.title".tr(),
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold
@@ -150,7 +165,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
                   break;
               }
             },
-            itemBuilder: (context) => _isAuthenticated
+            itemBuilder: (context) => isAuthenticated
             ? [
               PopupMenuItem(
                   value: 'profile',

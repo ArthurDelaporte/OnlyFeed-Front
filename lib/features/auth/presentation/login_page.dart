@@ -34,9 +34,11 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         final accessToken = response.data['access_token'];
         final refreshToken = response.data['refresh_token'];
+        final user = response.data['user'];
 
-        if (accessToken != null && refreshToken != null) {
+        if (accessToken != null && refreshToken != null && user != null) {
           await TokenManager.saveBoth(accessToken, refreshToken);
+          context.read<SessionNotifier>().setUser(user);
 
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.log.successful".tr())));
           context.go('/');

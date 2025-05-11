@@ -46,42 +46,48 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleNotifier>().locale;
 
+    if (_user == null) {
+      return ScaffoldWithHeader(body: Center(child: CircularProgressIndicator()));
+    }
+
     return ScaffoldWithHeader(
-      body: _user == null
-          ? Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (_user?['avatar_url'] != null)
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: NetworkImage(_user!['avatar_url']),
-              )
-            else
-              CircleAvatar(
-                radius: 50,
-                child: Icon(Icons.person, size: 40),
+      body: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (_user?['avatar_url'] != null)
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: NetworkImage(_user!['avatar_url']),
+                )
+              else
+                CircleAvatar(
+                  radius: 50,
+                  child: Icon(Icons.person, size: 40),
+                ),
+              SizedBox(height: 20),
+              Text(_user?['username'] ?? '', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text(_user?['email'] ?? '', style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              Text("${_user?['firstname'] ?? ''} ${_user?['lastname'] ?? ''}", style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              Text(_user?['bio'] ?? '', style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
+              SizedBox(height: 8),
+              Text("${'user.lang.language'.tr().capitalize()}: ${('user.lang.${context.locale.languageCode}').tr().capitalize()}", style: TextStyle(fontSize: 14)),
+              SizedBox(height: 8),
+              ElevatedButton.icon(
+                onPressed: () => context.go('/profile/edit'),
+                icon: Icon(Icons.edit),
+                label: Text("user.edit.edit_profile".tr()),
               ),
-            SizedBox(height: 20),
-            Text(_user?['username'] ?? '', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            SizedBox(height: 8),
-            Text(_user?['email'] ?? '', style: TextStyle(fontSize: 16)),
-            SizedBox(height: 8),
-            Text("${_user?['firstname'] ?? ''} ${_user?['lastname'] ?? ''}", style: TextStyle(fontSize: 16)),
-            SizedBox(height: 8),
-            Text(_user?['bio'] ?? '', style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
-            SizedBox(height: 8),
-            Text("${'user.lang.language'.tr().capitalize()}: ${('user.lang.'+context.locale.languageCode).tr().capitalize()}", style: TextStyle(fontSize: 14)),
-            SizedBox(height: 8),
-            ElevatedButton.icon(
-              onPressed: () => context.go('/profile/edit'),
-              icon: const Icon(Icons.edit),
-              label: Text("user.edit.edit_profile".tr()),
-            ),
-          ],
-        ),
+            ],
+          ),
+        )
       ),
     );
   }

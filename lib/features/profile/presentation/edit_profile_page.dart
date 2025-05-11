@@ -164,7 +164,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         : null);
 
     return ScaffoldWithHeader(
-      body: Center(
+      body: Padding(
+        padding: EdgeInsets.all(24),
         child: ListView(
           children: [
             Text("user.edit.edit_profile".tr(), style: Theme.of(context).textTheme.titleLarge),

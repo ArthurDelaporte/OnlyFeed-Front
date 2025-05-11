@@ -25,7 +25,7 @@ class OnlyFeedApp {
       GoRoute(path: '/profile', builder: (context, state) => ProfilePage()),
       GoRoute(path: '/profile/edit', builder: (context, state) => EditProfilePage()),
       GoRoute(
-        path: '/user/:username',
+        path: '/u/:username',
         builder: (context, state) {
           final username = state.pathParameters['username']!;
           return PublicProfilePage(username: username);
