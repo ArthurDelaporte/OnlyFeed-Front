@@ -58,5 +58,20 @@
     "search": {
       "search_user": "Search for a user"
     }
+  },
+  "post": {
+    "create_post": "Create New Post",
+    "title": "Title",
+    "title_required": "Title is required",
+    "description": "Description",
+    "add_photo": "Add a photo",
+    "pick_from_gallery": "Gallery",
+    "take_photo": "Camera",
+    "paid_content": "Paid content",
+    "paid_content_desc": "This content will be visible only for paid subscribers",
+    "publish": "Publish",
+    "create_success": "Post created successfully!",
+    "media_required": "A photo is required",
+    "image_pick_error": "Error selecting image"
   }
 }

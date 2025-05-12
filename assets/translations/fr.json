@@ -58,5 +58,20 @@
     "search": {
       "search_user": "Rechercher un utilisateur"
     }
+  },
+  "post": {
+    "create_post": "Créer un nouveau post",
+    "title": "Titre",
+    "title_required": "Le titre est obligatoire",
+    "description": "Description",
+    "add_photo": "Ajouter une photo",
+    "pick_from_gallery": "Galerie",
+    "take_photo": "Appareil photo",
+    "paid_content": "Contenu payant",
+    "paid_content_desc": "Ce contenu sera visible uniquement pour les abonnés payants",
+    "publish": "Publier",
+    "create_success": "Post créé avec succès !",
+    "media_required": "Une photo est requise",
+    "image_pick_error": "Erreur lors de la sélection de l'image"
   }
 }

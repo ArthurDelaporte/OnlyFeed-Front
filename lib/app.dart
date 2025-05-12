@@ -6,6 +6,10 @@ import 'package:onlyfeed_frontend/features/home/presentation/home_page.dart';
 import 'package:onlyfeed_frontend/features/profile/presentation/profile_page.dart';
 import 'package:onlyfeed_frontend/features/profile/presentation/edit_profile_page.dart';
 import 'package:onlyfeed_frontend/features/profile/presentation/public_profile_page.dart';
+import 'package:onlyfeed_frontend/features/post/presentation/create_post_page.dart';
+import 'package:onlyfeed_frontend/shared/notifiers/theme_notifier.dart';
+import 'package:provider/provider.dart';
+
 
 class OnlyFeedApp {
   static final router = GoRouter(
@@ -24,6 +28,7 @@ class OnlyFeedApp {
       // }),
       GoRoute(path: '/profile', builder: (context, state) => ProfilePage()),
       GoRoute(path: '/profile/edit', builder: (context, state) => EditProfilePage()),
+      GoRoute(path: '/create-post', builder: (context, state) => CreatePostPage()),
       GoRoute(
         path: '/u/:username',
         builder: (context, state) {

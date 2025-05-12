@@ -9,10 +9,15 @@ import 'package:onlyfeed_frontend/shared/shared.dart';
 
 class ScaffoldWithHeader extends StatefulWidget {
   final Widget body;
+  final Widget? floatingActionButton;
+  final String? title;
+
 
   const ScaffoldWithHeader({
     super.key,
     required this.body,
+    this.floatingActionButton,
+    this.title,
   });
 
   @override
@@ -177,7 +182,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader> with WidgetsBin
           child: GestureDetector(
             onTap: () => context.go('/'),
             child: Text(
-              "app.title".tr(),
+            widget.title ?? "app.title".tr(),
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold
@@ -274,6 +279,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader> with WidgetsBin
             : null,
       ),
       body: widget.body,
+      floatingActionButton: widget.floatingActionButton,
     );
   }
 }
