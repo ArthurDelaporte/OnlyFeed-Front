@@ -171,8 +171,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
             Text("user.edit.edit_profile".tr(), style: Theme.of(context).textTheme.titleLarge),
             SizedBox(height: 16),
             TextField(controller: _usernameCtrl, decoration: InputDecoration(labelText: 'user.field.username'.tr().capitalize())),
+            SizedBox(height: 8),
             TextField(controller: _firstnameCtrl, decoration: InputDecoration(labelText: 'user.field.firstname'.tr().capitalize())),
+            SizedBox(height: 8),
             TextField(controller: _lastnameCtrl, decoration: InputDecoration(labelText: 'user.field.lastname'.tr().capitalize())),
+            SizedBox(height: 8),
             TextField(controller: _bioCtrl, decoration: InputDecoration(labelText: 'user.field.bio'.tr().capitalize())),
             SizedBox(height: 16),
             Center(
@@ -189,7 +192,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
             ),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: _saveProfile, child: Text("user.edit.register".tr().capitalize())),
+            ElevatedButton(
+                onPressed: _saveProfile,
+                child: Text("user.edit.register".tr().capitalize())
+            ),
           ],
         ),
       ),

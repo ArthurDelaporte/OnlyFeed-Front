@@ -92,6 +92,7 @@ class _SignupPageState extends State<SignupPage> {
         MapEntry('lastname', lastname),
         MapEntry('bio', bio),
         MapEntry('language', _selectedLanguage),
+        MapEntry('theme', context.read<ThemeNotifier>().themeMode.toString())
       ]);
 
       if (_profileImage != null) {
@@ -169,10 +170,15 @@ class _SignupPageState extends State<SignupPage> {
             ),
             SizedBox(height: 16),
             TextField(controller: _emailCtrl, decoration: InputDecoration(labelText: 'user.field.email'.tr().capitalize())),
+            SizedBox(height: 8),
             TextField(controller: _passwordCtrl, decoration: InputDecoration(labelText: 'user.field.password'.tr().capitalize()), obscureText: true),
+            SizedBox(height: 8),
             TextField(controller: _usernameCtrl, decoration: InputDecoration(labelText: 'user.field.username'.tr().capitalize())),
+            SizedBox(height: 8),
             TextField(controller: _firstnameCtrl, decoration: InputDecoration(labelText: 'user.field.firstname'.tr().capitalize())),
+            SizedBox(height: 8),
             TextField(controller: _lastnameCtrl, decoration: InputDecoration(labelText: 'user.field.lastname'.tr().capitalize())),
+            SizedBox(height: 8),
             TextField(controller: _bioCtrl, decoration: InputDecoration(labelText: 'user.field.bio'.tr().capitalize())),
             SizedBox(height: 16),
             DropdownButtonFormField<String>(
@@ -209,9 +215,15 @@ class _SignupPageState extends State<SignupPage> {
             SizedBox(height: 12),
             Text('user.field.profile_picture'.tr().capitalize()),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: _signup, child: Text('user.sign.register'.tr().capitalize())),
+            ElevatedButton(
+                onPressed: _signup,
+                child: Text('user.sign.register'.tr().capitalize())
+            ),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: goToLogin, child: Text('user.sign.already_account'.tr())),
+            ElevatedButton(
+                onPressed: goToLogin,
+                child: Text('user.sign.already_account'.tr())
+            ),
           ],
         ),
       ),

@@ -40,6 +40,11 @@ class _LoginPageState extends State<LoginPage> {
           await TokenManager.saveBoth(accessToken, refreshToken);
           context.read<SessionNotifier>().setUser(user);
 
+          final theme = user['theme'];
+          if (theme != null) {
+            context.read<ThemeNotifier>().setTheme(parseThemeMode(theme));
+          }
+
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.log.successful".tr())));
           context.go('/');
         } else {
@@ -74,6 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                 controller: _emailCtrl,
                 decoration: InputDecoration(labelText: 'user.field.email'.tr().capitalize())
             ),
+            SizedBox(height: 8),
             TextField(
                 controller: _passwordCtrl,
                 decoration: InputDecoration(labelText: 'user.field.password'.tr().capitalize()),
@@ -82,9 +88,15 @@ class _LoginPageState extends State<LoginPage> {
                 onSubmitted: (_) => _login()
             ),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: _login, child: Text('user.log.login'.tr().capitalize())),
+            ElevatedButton(
+                onPressed: _login,
+                child: Text('user.log.login'.tr().capitalize())
+            ),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: goToSignup, child: Text('user.log.no_account'.tr())),
+            ElevatedButton(
+                onPressed: goToSignup,
+                child: Text('user.log.no_account'.tr())
+            ),
           ],
         ),
       ),

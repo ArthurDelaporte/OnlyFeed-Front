@@ -51,6 +51,12 @@
       "no_update": "No changes detected",
       "updated_success": "Updated profile",
       "update_failed": "Update failed"
+    },
+    "theme": {
+      "change_theme": "Change theme"
+    },
+    "search": {
+      "search_user": "Search for a user"
     }
   }
 }

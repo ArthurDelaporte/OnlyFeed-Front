@@ -25,6 +25,7 @@ void main() async {
         providers: [
           ChangeNotifierProvider(create: (_) => LocaleNotifier()),
           ChangeNotifierProvider(create: (_) => SessionNotifier()),
+          ChangeNotifierProvider(create: (_) => ThemeNotifier()),
         ],
         child: MyApp(),
       ),
@@ -61,8 +62,9 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       routerConfig: OnlyFeedApp.router,
       title: 'OnlyFeed',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppDarkTheme.darkTheme,
+      themeMode: context.watch<ThemeNotifier>().themeMode,
     );
   }
 }

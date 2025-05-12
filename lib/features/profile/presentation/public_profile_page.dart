@@ -26,6 +26,18 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
     _fetchUser();
   }
 
+  @override
+  void didUpdateWidget(covariant PublicProfilePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.username != widget.username) {
+      setState(() {
+        _user = null;
+        _isLoading = true;
+      });
+      _fetchUser();
+    }
+  }
+
   Future<void> _fetchUser() async {
     try {
       if (widget.username != "OnlyFeedAdmin") {

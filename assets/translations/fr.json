@@ -51,6 +51,12 @@
       "no_update": "Aucune modification détectée",
       "updated_success": "Profil mis à jour",
       "update_failed": "Échec de la mise à jour"
+    },
+    "theme": {
+      "change_theme": "Changer de thème"
+    },
+    "search": {
+      "search_user": "Rechercher un utilisateur"
     }
   }
 }

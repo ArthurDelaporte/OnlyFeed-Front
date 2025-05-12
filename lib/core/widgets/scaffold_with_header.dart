@@ -21,6 +21,9 @@ class ScaffoldWithHeader extends StatefulWidget {
 
 class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader> with WidgetsBindingObserver{
   bool _hasCheckedSession = false;
+  bool _showSearchBar = false;
+  final _searchCtrl = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -31,6 +34,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader> with WidgetsBin
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -66,6 +70,12 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader> with WidgetsBin
           if (language != null && locale.locale.languageCode != language) {
             locale.setLocale(Locale(language));
           }
+
+          final themePref = user['theme'];
+          if (themePref != null) {
+            final themeNotifier = context.read<ThemeNotifier>();
+            themeNotifier.setTheme(parseThemeMode(themePref));
+          }
         } catch (_) {}
       }
     }
@@ -99,6 +109,31 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader> with WidgetsBin
     setState(() {});
   }
 
+  void _toggleTheme() async {
+    final themeNotifier = context.read<ThemeNotifier>();
+    final session = context.read<SessionNotifier>();
+
+    final isDark = themeNotifier.themeMode == ThemeMode.dark;
+    final newMode = isDark ? ThemeMode.light : ThemeMode.dark;
+
+    themeNotifier.setTheme(newMode);
+
+    if (session.isAuthenticated) {
+      try {
+        final dio = DioClient().dio;
+        await dio.put(
+          '/api/me',
+          data: FormData.fromMap({'theme': newMode.name}),
+          options: Options(contentType: 'multipart/form-data'),
+        );
+      } catch (_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("core.error".tr())),
+        );
+      }
+    }
+  }
+
   Future<void> _logout() async {
     try {
       final dio = DioClient().dio;
@@ -117,6 +152,15 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader> with WidgetsBin
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("${"core.error".tr()} : $e")),
       );
+    }
+  }
+
+  void _onSearchSubmit(String value) {
+    final username = value.trim();
+    if (username.isNotEmpty) {
+      context.go('/u/$username');
+      setState(() => _showSearchBar = false);
+      _searchCtrl.clear();
     }
   }
 
@@ -142,11 +186,32 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader> with WidgetsBin
           ),
         ),
         actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+              onPressed: () {
+                setState(() => _showSearchBar = !_showSearchBar);
+                if (!_showSearchBar) return;
+
+                // Attendre la fin du build avant de donner le focus
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _searchFocusNode.requestFocus();
+                });
+              }
+          ),
+          IconButton(
+            icon: Icon(
+              context.watch<ThemeNotifier>().themeMode == ThemeMode.dark
+                  ? Icons.dark_mode
+                  : Icons.light_mode,
+            ),
+            onPressed: _toggleTheme,
+            tooltip: "user.theme.change_theme".tr(),
+          ),
           TextButton(
             onPressed: _toggleLocale,
             child: Text(
                 locale.languageCode.toUpperCase(),
-                style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           PopupMenuButton<String>(
             onSelected: (value) async {
@@ -187,6 +252,26 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader> with WidgetsBin
             ],
           ),
         ],
+        bottom: _showSearchBar
+            ? PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              controller: _searchCtrl,
+              focusNode: _searchFocusNode,
+              decoration: InputDecoration(
+                hintText: "${"user.search.search_user".tr()}...",
+                filled: true,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
+              onSubmitted: _onSearchSubmit,
+              textInputAction: TextInputAction.search,
+            ),
+          ),
+        )
+            : null,
       ),
       body: widget.body,
     );
