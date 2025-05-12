@@ -45,6 +45,13 @@ class _ProfilePageState extends State<ProfilePage> {
     // final currentLocale = context.locale; // OBLIGATOIRE POUR LE CHANGEMENT DE LANGUE
 
     return ScaffoldWithHeader(
+      // Ajouter ce FloatingActionButton pour permettre de créer un post
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push('/create-post'),
+        backgroundColor: Theme.of(context).primaryColor,
+        child: Icon(Icons.add_a_photo, color: Colors.white),
+        tooltip: context.tr("post.create_post"),
+      ),
       body: _user == null
           ? Center(child: CircularProgressIndicator())
           : Padding(

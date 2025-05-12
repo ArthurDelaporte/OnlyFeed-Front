@@ -10,10 +10,15 @@ import 'package:provider/provider.dart';
 
 class ScaffoldWithHeader extends StatefulWidget {
   final Widget body;
+  final Widget? floatingActionButton;
+  final String? title;
+
 
   const ScaffoldWithHeader({
     super.key,
     required this.body,
+    this.floatingActionButton,
+    this.title,
   });
 
   @override
@@ -112,7 +117,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
           child: GestureDetector(
             onTap: () => context.go('/'),
             child: Text(
-            context.tr("app.title"),
+            widget.title ?? context.tr("app.title"),
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold
@@ -166,6 +171,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader>{
         ],
       ),
       body: widget.body,
+      floatingActionButton: widget.floatingActionButton,
     );
   }
 }
