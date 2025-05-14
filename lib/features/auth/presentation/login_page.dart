@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void goToSignup() {
-    context.go('/signup');
+    context.go('/account/signup');
   }
 
   @override

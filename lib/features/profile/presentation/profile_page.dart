@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 import 'package:onlyfeed_frontend/features/post/model/post_model.dart';
 import 'package:onlyfeed_frontend/features/post/services/post_service.dart';
 import 'package:onlyfeed_frontend/features/post/widgets/post_grid.dart';
-
-import 'package:provider/provider.dart';
 import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -20,13 +19,14 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final _dio = DioClient().dio;
+
   Map<String, dynamic>? _user;
 
   @override
   void initState() {
     super.initState();
     _fetchUserProfile();
-    
+
     // Utiliser le provider pour charger les posts
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PostProvider>().fetchUserPosts();
@@ -53,9 +53,15 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final locale = context.watch<LocaleNotifier>().locale;
+
+    if (_user == null) {
+      return ScaffoldWithHeader(body: Center(child: CircularProgressIndicator()));
+    }
+
     // Observer le provider pour les posts
     final postProvider = context.watch<PostProvider>();
-    
+
     return ScaffoldWithHeader(
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/create-post'),
@@ -103,11 +109,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       Text("${'user.lang.language'.tr().capitalize()}: ${('user.lang.${context.locale.languageCode}').tr().capitalize()}", style: TextStyle(fontSize: 14)),
                       SizedBox(height: 8),
                       ElevatedButton.icon(
-                        onPressed: () => context.go('/profile/edit'),
+                        onPressed: () => context.go('/${_user?['username']}/edit'),
                         icon: Icon(Icons.edit),
                         label: Text("user.edit.edit_profile".tr()),
                       ),
-                      
+
                       // Nouvelle section pour les posts
                       SizedBox(height: 32),
                       Text(
@@ -115,7 +121,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 16),
-                      
+
                       // Utilisation du widget de grille réutilisable avec le provider
                       PostGrid(
                         posts: postProvider.userPosts,

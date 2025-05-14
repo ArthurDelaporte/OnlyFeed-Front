@@ -163,7 +163,7 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader> with WidgetsBin
   void _onSearchSubmit(String value) {
     final username = value.trim();
     if (username.isNotEmpty) {
-      context.go('/u/$username');
+      context.go('/$username');
       setState(() => _showSearchBar = false);
       _searchCtrl.clear();
     }
@@ -222,16 +222,16 @@ class _ScaffoldWithHeaderState extends State<ScaffoldWithHeader> with WidgetsBin
             onSelected: (value) async {
               switch (value) {
                 case 'profile':
-                  context.go('/profile');
+                  context.go('/${session.user?['username']}');
                   break;
                 case 'logout':
                   await _logout();
                   break;
                 case 'login':
-                  context.go('/login');
+                  context.go('/account/login');
                   break;
                 case 'signup':
-                  context.go('/signup');
+                  context.go('/account/signup');
                   break;
               }
             },

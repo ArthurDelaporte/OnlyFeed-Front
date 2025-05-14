@@ -40,7 +40,7 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
 
   Future<void> _fetchUser() async {
     try {
-      if (widget.username != "OnlyFeedAdmin") {
+      if (widget.username != "OnlyFeed") {
         final response = await _dio.get('/api/users/username/${widget.username}');
         setState(() {
           _user = response.data['user'];

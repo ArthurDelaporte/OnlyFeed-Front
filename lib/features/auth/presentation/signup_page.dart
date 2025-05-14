@@ -124,7 +124,7 @@ class _SignupPageState extends State<SignupPage> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.sign.successful".tr())));
-        context.go('/login');
+        context.go('/account/login');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user.sign.error".tr())));
       }
@@ -153,7 +153,7 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void goToLogin() {
-    context.go('/login');
+    context.go('/account/login');
   }
 
   @override

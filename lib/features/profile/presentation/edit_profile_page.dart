@@ -134,7 +134,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("user.edit.updated_success".tr())),
         );
-        context.go('/profile');
+        context.go('/${username}');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("user.edit.update_failed".tr())),
