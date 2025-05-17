@@ -18,16 +18,25 @@ class Post {
   });
 
   factory Post.fromJson(Map<String, dynamic> json) {
+    // Debug pour voir les clés disponibles dans le JSON
+    print("Clés disponibles dans le JSON du post: ${json.keys.toList()}");
+    
+    // Extraire les valeurs avec gestion de la casse
+    String mediaUrl = json['media_url'] ?? json['MediaURL'] ?? '';
+    print("URL extraite du post: $mediaUrl");
+    
     return Post(
-      id: json['id'] ?? '',
-      userId: json['user_id'] ?? '',
-      title: json['title'] ?? '',
-      description: json['description'] ?? '',
-      mediaURL: json['media_url'] ?? '',
-      isPaid: json['is_paid'] ?? false,
+      id: json['id'] ?? json['ID'] ?? '',
+      userId: json['user_id'] ?? json['UserID'] ?? '',
+      title: json['title'] ?? json['Title'] ?? '',
+      description: json['description'] ?? json['Description'] ?? '',
+      mediaURL: mediaUrl,
+      isPaid: json['is_paid'] ?? json['IsPaid'] ?? false,
       createdAt: json['created_at'] != null 
-        ? DateTime.parse(json['created_at']) 
-        : DateTime.now(),
+        ? DateTime.parse(json['created_at'])
+        : json['CreatedAt'] != null
+          ? DateTime.parse(json['CreatedAt'])
+          : DateTime.now(),
     );
   }
 

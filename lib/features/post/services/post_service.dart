@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:typed_data';  // Ajoutez cet import
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
-import 'package:http_parser/http_parser.dart';  // Ajoutez cet import
+import 'package:http_parser/http_parser.dart';
 import 'package:onlyfeed_frontend/features/post/model/post_model.dart';
 import 'package:onlyfeed_frontend/shared/services/dio_client.dart';
 
@@ -18,8 +18,22 @@ class PostService {
     );
 
     if (response.statusCode == 200) {
+      print("Réponse complète de /api/posts: ${response.data}");
       final List<dynamic> postsJson = response.data['posts'];
-      return postsJson.map((json) => Post.fromJson(json)).toList();
+      
+      // Debug pour chaque post
+      for (var i = 0; i < postsJson.length; i++) {
+        print("Post $i avant conversion getAllPosts: ${postsJson[i]}");
+      }
+      
+      final posts = postsJson.map((json) => Post.fromJson(json)).toList();
+      
+      // Vérifier les posts après conversion
+      for (var i = 0; i < posts.length; i++) {
+        print("Post $i après conversion getAllPosts - mediaURL: ${posts[i].mediaURL}");
+      }
+      
+      return posts;
     } else {
       throw Exception('Erreur lors de la récupération des posts');
     }
@@ -30,8 +44,22 @@ class PostService {
     final response = await _dio.get('/api/posts/me');
 
     if (response.statusCode == 200) {
+      print("Réponse complète de /api/posts/me: ${response.data}");
       final List<dynamic> postsJson = response.data['posts'];
-      return postsJson.map((json) => Post.fromJson(json)).toList();
+      
+      // Debug pour chaque post
+      for (var i = 0; i < postsJson.length; i++) {
+        print("Post $i avant conversion getUserPosts: ${postsJson[i]}");
+      }
+      
+      final posts = postsJson.map((json) => Post.fromJson(json)).toList();
+      
+      // Vérifier les posts après conversion
+      for (var i = 0; i < posts.length; i++) {
+        print("Post $i après conversion getUserPosts - mediaURL: ${posts[i].mediaURL}");
+      }
+      
+      return posts;
     } else {
       throw Exception('Erreur lors de la récupération de vos posts');
     }
@@ -42,12 +70,21 @@ class PostService {
     final response = await _dio.get('/api/posts/$id');
 
     if (response.statusCode == 200) {
-      return Post.fromJson(response.data['post']);
+      print("Réponse complète de /api/posts/$id: ${response.data}");
+      final json = response.data['post'];
+      print("Post avant conversion getPostById: $json");
+      
+      final post = Post.fromJson(json);
+      print("Post après conversion getPostById - mediaURL: ${post.mediaURL}");
+      
+      return post;
     } else {
       throw Exception('Erreur lors de la récupération du post');
     }
   }
 
+  // Les autres méthodes restent inchangées
+  
   // Créer un nouveau post (pour mobile)
   Future<Post> createPost({
     required String title,
@@ -72,6 +109,7 @@ class PostService {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
+      print("Réponse de création de post: ${response.data}");
       return Post.fromJson(response.data['post']);
     } else {
       throw Exception('Erreur lors de la création du post');
@@ -117,6 +155,7 @@ class PostService {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
+      print("Réponse de création de post web: ${response.data}");
       return Post.fromJson(response.data['post']);
     } else {
       throw Exception('Erreur lors de la création du post');

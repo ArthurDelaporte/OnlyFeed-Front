@@ -72,6 +72,8 @@
     "publish": "Publish",
     "create_success": "Post created successfully!",
     "media_required": "A photo is required",
-    "image_pick_error": "Error selecting image"
+    "image_pick_error": "Error selecting image",
+    "my_posts": "My posts",
+    "no_posts_yet": "You haven't posted any content yet"
   }
 }

@@ -36,6 +36,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (response.statusCode == 200) {
         setState(() => _user = response.data['user']);
+        // Afficher l'URL de l'avatar pour comparaison
+        print("Avatar URL: ${_user?['avatar_url']}");
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("core.error".tr())),
@@ -56,14 +58,32 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     
     try {
-      final posts = await _postService.getUserPosts();
-      if (mounted) {
-        setState(() {
-          _userPosts = posts;
-          _isLoadingPosts = false;
-        });
+      // Récupérer directement la réponse pour inspecter les données
+      final response = await _dio.get('/api/posts/me');
+      print("Réponse brute de l'API posts: ${response.data}");
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> postsJson = response.data['posts'];
+        
+        // Examiner chaque post pour vérifier les URLs des médias
+        for (var postJson in postsJson) {
+          print("Post ID: ${postJson['id']}");
+          print("MediaURL: ${postJson['media_url']}");
+        }
+        
+        final posts = postsJson.map((json) => Post.fromJson(json)).toList();
+        
+        if (mounted) {
+          setState(() {
+            _userPosts = posts;
+            _isLoadingPosts = false;
+          });
+        }
+      } else {
+        throw Exception("Erreur: ${response.statusCode}");
       }
     } catch (e) {
+      print("Erreur lors de la récupération des posts: $e");
       if (mounted) {
         setState(() {
           _isLoadingPosts = false;
@@ -160,15 +180,15 @@ class _ProfilePageState extends State<ProfilePage> {
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.75,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
+                            crossAxisCount: 3, // 3 posts par ligne
+                            crossAxisSpacing: 2, // Espacement minimal
+                            mainAxisSpacing: 2, // Espacement minimal
+                            childAspectRatio: 1, // Format carré
                           ),
                           itemCount: _userPosts.length,
                           itemBuilder: (context, index) {
                             final post = _userPosts[index];
-                            return PostCard(post: post);
+                            return InstagramPostCard(post: post);
                           },
                         ),
                     ],
@@ -180,7 +200,82 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-// Widget séparé pour afficher un post
+// Widget pour afficher un post style Instagram
+class InstagramPostCard extends StatelessWidget {
+  final Post post;
+
+  const InstagramPostCard({
+    Key? key,
+    required this.post,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        // Vous pourriez naviguer vers une page de détail du post
+        // Par exemple: context.push('/post/${post.id}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Post: ${post.title}")),
+        );
+      },
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Image du post
+          post.mediaURL.isNotEmpty
+            ? Image.network(
+                post.mediaURL,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded / 
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: Icon(Icons.broken_image, color: Colors.grey[500]),
+                  );
+                },
+              )
+            : Container(
+                color: Colors.grey[200],
+                child: Icon(Icons.image_not_supported, color: Colors.grey[400]),
+              ),
+          
+          // Indicateur de contenu payant
+          if (post.isPaid)
+            Positioned(
+              top: 4,
+              right: 4,
+              child: Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Icon(
+                  Icons.lock,
+                  color: Colors.amber,
+                  size: 12,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// Gardez l'ancienne classe PostCard pour référence ou supprimez-la
+// Ne pas utiliser les deux à la fois dans la grille
 class PostCard extends StatelessWidget {
   final Post post;
 
@@ -191,6 +286,10 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Logging pour déboguer les URLs
+    print("Affichage du post avec ID: ${post.id}");
+    print("URL du média: ${post.mediaURL}");
+    
     return Card(
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
@@ -199,8 +298,10 @@ class PostCard extends StatelessWidget {
       elevation: 2,
       child: InkWell(
         onTap: () {
-          // Vous pourriez ajouter une navigation vers une page de détails du post ici
-          // context.push('/post/${post.id}');
+          // Afficher l'URL pour débogage
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("URL: ${post.mediaURL}")),
+          );
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,20 +311,61 @@ class PostCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(
-                    post.mediaURL,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(child: CircularProgressIndicator());
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey[300],
-                        child: Icon(Icons.broken_image, color: Colors.grey[500]),
-                      );
-                    },
-                  ),
+                  // Vérifier si l'URL n'est pas vide avant d'afficher l'image
+                  post.mediaURL.isNotEmpty
+                    ? Image.network(
+                        post.mediaURL,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded / 
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          print("Erreur de chargement d'image: $error");
+                          print("URL problématique: ${post.mediaURL}");
+                          
+                          return Container(
+                            color: Colors.grey[300],
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.broken_image, color: Colors.grey[500], size: 32),
+                                SizedBox(height: 4),
+                                Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Text(
+                                    "Erreur de chargement",
+                                    style: TextStyle(fontSize: 10),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        color: Colors.grey[200],
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.image_not_supported, color: Colors.grey[400], size: 32),
+                            SizedBox(height: 4),
+                            Text(
+                              "Aucune image disponible",
+                              style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
                   if (post.isPaid)
                     Positioned(
                       top: 8,

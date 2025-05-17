@@ -72,6 +72,8 @@
     "publish": "Publier",
     "create_success": "Post créé avec succès !",
     "media_required": "Une photo est requise",
-    "image_pick_error": "Erreur lors de la sélection de l'image"
-  }
+    "image_pick_error": "Erreur lors de la sélection de l'image",
+    "my_posts": "Mes publications",
+    "no_posts_yet": "Vous n'avez pas encore publié de contenu"
+    }
 }
