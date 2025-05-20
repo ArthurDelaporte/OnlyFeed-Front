@@ -8,6 +8,9 @@ import 'package:onlyfeed_frontend/features/post/model/post_model.dart';
 import 'package:onlyfeed_frontend/features/post/services/post_service.dart';
 import 'package:onlyfeed_frontend/features/post/widgets/post_grid.dart';
 
+import 'package:provider/provider.dart';
+import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart';
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -17,17 +20,17 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final _dio = DioClient().dio;
-  final _postService = PostService();
-
   Map<String, dynamic>? _user;
-  List<Post> _userPosts = [];
-  bool _isLoadingPosts = false;
 
   @override
   void initState() {
     super.initState();
     _fetchUserProfile();
-    _fetchUserPosts();
+    
+    // Utiliser le provider pour charger les posts
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<PostProvider>().fetchUserPosts();
+    });
   }
 
   Future<void> _fetchUserProfile() async {
@@ -48,33 +51,11 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> _fetchUserPosts() async {
-    if (mounted) {
-      setState(() {
-        _isLoadingPosts = true;
-      });
-    }
-    
-    try {
-      final posts = await _postService.getUserPosts();
-      
-      if (mounted) {
-        setState(() {
-          _userPosts = posts;
-          _isLoadingPosts = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoadingPosts = false;
-        });
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    // Observer le provider pour les posts
+    final postProvider = context.watch<PostProvider>();
+    
     return ScaffoldWithHeader(
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/create-post'),
@@ -88,7 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
               onRefresh: () async {
                 await Future.wait([
                   _fetchUserProfile(),
-                  _fetchUserPosts(),
+                  context.read<PostProvider>().fetchUserPosts(),
                 ]);
               },
               child: SingleChildScrollView(
@@ -135,10 +116,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       SizedBox(height: 16),
                       
-                      // Utilisation du widget de grille réutilisable
+                      // Utilisation du widget de grille réutilisable avec le provider
                       PostGrid(
-                        posts: _userPosts,
-                        isLoading: _isLoadingPosts,
+                        posts: postProvider.userPosts,
+                        isLoading: postProvider.isLoading,
                       ),
                     ],
                   ),

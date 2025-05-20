@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
 import 'package:onlyfeed_frontend/features/post/services/post_service.dart';
+import 'package:provider/provider.dart';
+import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart';
 
 class CreatePostPage extends StatefulWidget {
   const CreatePostPage({Key? key}) : super(key: key);
@@ -109,24 +111,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
       });
 
       try {
-        if (kIsWeb) {
-          // Appel spécifique pour le web
-          await _postService.createPostWeb(
-            title: _titleController.text,
-            description: _descriptionController.text,
-            imageBytes: _webImageBytes!,
-            fileName: _fileName ?? 'image.jpg',
-            isPaid: _isPaid,
-          );
-        } else {
-          // Appel pour mobile
-          await _postService.createPost(
-            title: _titleController.text,
-            description: _descriptionController.text,
-            mediaFile: _mediaFile!,
-            isPaid: _isPaid,
-          );
-        }
+        // Utiliser le Provider pour créer le post
+        await context.read<PostProvider>().createPost(
+          title: _titleController.text,
+          description: _descriptionController.text,
+          isPaid: _isPaid,
+          mediaFile: _mediaFile,
+          imageBytes: _webImageBytes,
+          fileName: _fileName,
+        );
 
         setState(() {
           _isLoading = false;

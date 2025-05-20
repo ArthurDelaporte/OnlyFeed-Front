@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:onlyfeed_frontend/app.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 import 'package:onlyfeed_frontend/shared/utils/platform/web_event_listener.dart';
+import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart'; // Ajoutez cet import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +27,7 @@ void main() async {
           ChangeNotifierProvider(create: (_) => LocaleNotifier()),
           ChangeNotifierProvider(create: (_) => SessionNotifier()),
           ChangeNotifierProvider(create: (_) => ThemeNotifier()),
+          ChangeNotifierProvider(create: (_) => PostProvider()), // Ajoutez cette ligne
         ],
         child: MyApp(),
       ),
