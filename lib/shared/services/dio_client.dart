@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:onlyfeed_frontend/shared/services/token_manager.dart';
 
-// Liaison avec backend avec access_token en Authorization Bearer
 class DioClient {
   static final DioClient _instance = DioClient._internal();
 
@@ -10,10 +10,28 @@ class DioClient {
   late Dio dio;
 
   DioClient._internal() {
-    dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080'))
+    // URL selon la plateforme
+    String baseUrl;
+    if (kIsWeb) {
+      baseUrl = 'http://localhost:8080';
+    } else {
+      baseUrl = 'http://10.0.2.2:8080';  // Émulateur Android
+    }
+
+    dio = Dio(BaseOptions(
+      baseUrl: baseUrl,
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    ))
       ..interceptors.add(
         InterceptorsWrapper(
           onRequest: (options, handler) async {
+            print('🚀 Requête vers: ${options.baseUrl}${options.path}'); // Debug
+            
             final accessToken = await TokenManager.getAccessToken();
             final refreshToken = await TokenManager.getRefreshToken();
 
@@ -27,11 +45,18 @@ class DioClient {
             return handler.next(options);
           },
           onResponse: (response, handler) async {
+            print('✅ Réponse reçue: ${response.statusCode}'); // Debug
+            
             final newAccessToken = response.headers['X-New-Access-Token']?.first;
             if (newAccessToken != null && newAccessToken.isNotEmpty) {
               await TokenManager.save(newAccessToken);
             }
             return handler.next(response);
+          },
+          onError: (error, handler) {
+            print('❌ Erreur Dio: ${error.message}'); // Debug
+            print('❌ URL: ${error.requestOptions.baseUrl}${error.requestOptions.path}');
+            return handler.next(error);
           },
         ),
       );

@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"  # Frontend accessible sur localhost:3000
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - onlyfeed-network
+
+# Réseau pour communiquer avec d'autres services si nécessaire
+networks:
+  onlyfeed-network:
+    driver: bridge
