@@ -18,7 +18,7 @@ class PostDetailView extends StatefulWidget {
 class _PostDetailViewState extends State<PostDetailView> {
   // Contrôleur pour le champ de commentaire
   final TextEditingController _commentController = TextEditingController();
-  final _dio = DioClient().dio; // Utilise ton DioClient existant
+  final _dio = DioClient().dio;
   
   // Liste des commentaires depuis l'API
   List<Map<String, dynamic>> comments = [];

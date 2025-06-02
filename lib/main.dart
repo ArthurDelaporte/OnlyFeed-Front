@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:onlyfeed_frontend/app.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 import 'package:onlyfeed_frontend/shared/utils/platform/web_event_listener.dart';
-import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart'; // Ajoutez cet import
+import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  await dotenv.load();
 
   setUrlStrategy(PathUrlStrategy());
 
@@ -27,7 +29,7 @@ void main() async {
           ChangeNotifierProvider(create: (_) => LocaleNotifier()),
           ChangeNotifierProvider(create: (_) => SessionNotifier()),
           ChangeNotifierProvider(create: (_) => ThemeNotifier()),
-          ChangeNotifierProvider(create: (_) => PostProvider()), // Ajoutez cette ligne
+          ChangeNotifierProvider(create: (_) => PostProvider()),
         ],
         child: MyApp(),
       ),

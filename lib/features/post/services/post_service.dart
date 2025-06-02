@@ -116,7 +116,6 @@ class PostService {
     }
   }
 
-  // Ajoutez cette nouvelle méthode pour le web
   Future<Post> createPostWeb({
     required String title,
     required String description,

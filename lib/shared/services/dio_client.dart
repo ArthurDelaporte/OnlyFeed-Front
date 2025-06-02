@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:onlyfeed_frontend/shared/services/token_manager.dart';
 
 class DioClient {
@@ -10,13 +11,7 @@ class DioClient {
   late Dio dio;
 
   DioClient._internal() {
-    // URL selon la plateforme
-    String baseUrl;
-    if (kIsWeb) {
-      baseUrl = 'http://localhost:8080';
-    } else {
-      baseUrl = 'http://10.0.2.2:8080';  // Émulateur Android
-    }
+    final baseUrl = dotenv.env['BASE_URL'] ?? 'http://localhost:8080';
 
     dio = Dio(BaseOptions(
       baseUrl: baseUrl,
@@ -30,8 +25,6 @@ class DioClient {
       ..interceptors.add(
         InterceptorsWrapper(
           onRequest: (options, handler) async {
-            print('🚀 Requête vers: ${options.baseUrl}${options.path}'); // Debug
-            
             final accessToken = await TokenManager.getAccessToken();
             final refreshToken = await TokenManager.getRefreshToken();
 
@@ -45,8 +38,6 @@ class DioClient {
             return handler.next(options);
           },
           onResponse: (response, handler) async {
-            print('✅ Réponse reçue: ${response.statusCode}'); // Debug
-            
             final newAccessToken = response.headers['X-New-Access-Token']?.first;
             if (newAccessToken != null && newAccessToken.isNotEmpty) {
               await TokenManager.save(newAccessToken);
@@ -54,8 +45,6 @@ class DioClient {
             return handler.next(response);
           },
           onError: (error, handler) {
-            print('❌ Erreur Dio: ${error.message}'); // Debug
-            print('❌ URL: ${error.requestOptions.baseUrl}${error.requestOptions.path}');
             return handler.next(error);
           },
         ),

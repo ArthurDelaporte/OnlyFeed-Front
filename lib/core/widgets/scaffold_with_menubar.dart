@@ -109,17 +109,39 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
     final languageCode = locale.languageCode;
     final user = session.user;
     final username = user?['username'];
+    final isMobile = width < sizeMinSidebar;
 
     final items = <SidebarItem>[
       SidebarItem.home,
       SidebarItem.search,
-      SidebarItem.chats,
-      SidebarItem.language,
-      SidebarItem.theme,
+      if (session.isAuthenticated) SidebarItem.chats,
+      if (!isMobile) ...[
+        SidebarItem.language,
+        SidebarItem.theme,
+      ],
       if (session.isAuthenticated)
         SidebarItem.profile
       else SidebarItem.login,
     ];
+
+    PreferredSizeWidget mobileAppBar() {
+      return AppBar(
+        title: Text("OnlyFeed", style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        actionsPadding: EdgeInsets.only(right: 16),
+        actions: [
+          IconButton(
+            icon: _buildIcon(SidebarItem.language, themeMode, languageCode),
+            onPressed: _toggleLocale,
+          ),
+          SizedBox(width: 8),
+          IconButton(
+            icon: _buildIcon(SidebarItem.theme, themeMode, languageCode),
+            onPressed: _toggleTheme,
+          ),
+        ],
+      );
+    }
 
     List<NavigationDestination> bottomDestinations = items.map((item) {
       return NavigationDestination(
@@ -138,7 +160,7 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
       );
     }).toList();
 
-    Widget nav = width < sizeMinSidebar
+    Widget nav = isMobile
       ? SizedBox(
         height: 80,
         child: Container(
@@ -185,11 +207,11 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
       );
 
     return Scaffold(
-      body: width < sizeMinSidebar
+      appBar: isMobile ? mobileAppBar() : null,
+      body: isMobile
         ? Column(
           children: [
             Expanded(child: widget.body),
-            Divider(height: 1, color: Theme.of(context).appBarTheme.titleTextStyle?.color),
             nav,
           ]
         )
