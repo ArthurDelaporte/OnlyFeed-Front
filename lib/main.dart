@@ -51,6 +51,9 @@ class _MyAppState extends State<MyApp> {
     setupWebStorageListener(() {
       context.read<SessionNotifier>().refreshUser();
     });
+
+    // 🔄 Initialiser la session au démarrage
+    context.read<SessionNotifier>().refreshUser();
   }
 
   @override

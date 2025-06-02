@@ -9,7 +9,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
+import 'package:onlyfeed_frontend/core/widgets/scaffold_with_menubar.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -152,7 +152,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final locale = context.watch<LocaleNotifier>().locale;
 
     if (_isLoading) {
-      return ScaffoldWithHeader(body: Center(child: CircularProgressIndicator()));
+      return ScaffoldWithMenubar(body: Center(child: CircularProgressIndicator()));
     }
 
     final imageProvider = _newImage != null
@@ -163,7 +163,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ? NetworkImage(_avatarUrl!)
         : null);
 
-    return ScaffoldWithHeader(
+    return ScaffoldWithMenubar(
       body: Padding(
         padding: EdgeInsets.all(24),
         child: ListView(

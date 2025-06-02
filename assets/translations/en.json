@@ -53,7 +53,12 @@
       "update_failed": "Update failed"
     },
     "theme": {
-      "change_theme": "Change theme"
+      "change_theme": "Change theme",
+      "ThemeMode": {
+        "light": "light mode",
+        "dark": "dark mode",
+        "system": "system mode"
+      }
     },
     "search": {
       "search_user": "Search for a user"
@@ -75,5 +80,8 @@
     "image_pick_error": "Error selecting image",
     "my_posts": "My posts",
     "no_posts_yet": "You haven't posted any content yet"
+  },
+  "chat": {
+    "messages": "messages"
   }
 }

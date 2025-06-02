@@ -53,7 +53,12 @@
       "update_failed": "Échec de la mise à jour"
     },
     "theme": {
-      "change_theme": "Changer de thème"
+      "change_theme": "Changer de thème",
+      "ThemeMode": {
+        "light": "mode clair",
+        "dark": "mode sombre",
+        "system": "mode du système"
+      }
     },
     "search": {
       "search_user": "Rechercher un utilisateur"
@@ -75,5 +80,8 @@
     "image_pick_error": "Erreur lors de la sélection de l'image",
     "my_posts": "Mes publications",
     "no_posts_yet": "Vous n'avez pas encore publié de contenu"
-    }
+  },
+  "chat": {
+    "messages": "messages"
+  }
 }

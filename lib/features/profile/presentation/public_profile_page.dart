@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 
-import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
+import 'package:onlyfeed_frontend/core/widgets/scaffold_with_menubar.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 
 class PublicProfilePage extends StatefulWidget {
@@ -60,14 +60,14 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
     final locale = context.watch<LocaleNotifier>().locale;
 
     if (_isLoading) {
-      return ScaffoldWithHeader(body: Center(child: CircularProgressIndicator()));
+      return ScaffoldWithMenubar(body: Center(child: CircularProgressIndicator()));
     }
 
     if (_user == null) {
-      return ScaffoldWithHeader(body: Center(child: Text("user.not_found".tr())));
+      return ScaffoldWithMenubar(body: Center(child: Text("user.not_found".tr())));
     }
 
-    return ScaffoldWithHeader(
+    return ScaffoldWithMenubar(
       body: SingleChildScrollView(
         physics: AlwaysScrollableScrollPhysics(),
         child: Container(

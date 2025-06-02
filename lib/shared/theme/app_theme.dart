@@ -11,7 +11,7 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     primaryColor: AppColors.abricot,
-    scaffoldBackgroundColor: AppColors.pain,
+    scaffoldBackgroundColor: Colors.white,
     appBarTheme: AppBarTheme(
       backgroundColor: AppColors.pain,
       foregroundColor: AppColors.chocolat,
@@ -26,10 +26,8 @@ class AppTheme {
     colorScheme: ColorScheme.light(
       primary: AppColors.abricot,
       secondary: AppColors.basilic,
-      background: AppColors.pain,
       onPrimary: Colors.white,
       onSecondary: AppColors.chocolat,
-      onBackground: AppColors.chocolat,
       onSurface: AppColors.chocolat,
     ),
     textTheme: TextTheme(
@@ -74,10 +72,8 @@ class AppDarkTheme {
     colorScheme: ColorScheme.dark(
       primary: AppColors.abricot,
       secondary: AppColors.basilic,
-      background: Color(0xFF1E1E1E),
       onPrimary: Colors.white,
       onSecondary: AppColors.pain,
-      onBackground: Colors.white,
       onSurface: Colors.white70,
     ),
     textTheme: TextTheme(

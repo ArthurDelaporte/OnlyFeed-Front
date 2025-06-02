@@ -13,7 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:provider/provider.dart';
 
-import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
+import 'package:onlyfeed_frontend/core/widgets/scaffold_with_menubar.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 
 class SignupPage extends StatefulWidget {
@@ -160,7 +160,7 @@ class _SignupPageState extends State<SignupPage> {
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleNotifier>().locale;
 
-    return ScaffoldWithHeader(
+    return ScaffoldWithMenubar(
       body: Padding(
         padding: EdgeInsets.all(24),
         child: ListView(
