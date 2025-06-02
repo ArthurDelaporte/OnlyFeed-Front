@@ -15,7 +15,7 @@ class HomePage extends StatelessWidget {
 
     return ScaffoldWithMenubar(
       body: Center(
-        child: Text(context.tr('app.welcome')),
+        child: Text("app.welcome".tr()),
       ),
     );
   }

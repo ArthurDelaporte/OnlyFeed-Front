@@ -60,7 +60,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.tr("post.image_pick_error"))),
+          SnackBar(content: Text("post.image_pick_error".tr())),
         );
       }
     }
@@ -80,7 +80,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
               children: <Widget>[
                 ListTile(
                   leading: const Icon(Icons.photo_library),
-                  title: Text(context.tr("post.pick_from_gallery")),
+                  title: Text("post.pick_from_gallery".tr()),
                   onTap: () {
                     Navigator.pop(context);
                     _pickImage(ImageSource.gallery);
@@ -88,7 +88,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.photo_camera),
-                  title: Text(context.tr("post.take_photo")),
+                  title: Text("post.take_photo".tr()),
                   onTap: () {
                     Navigator.pop(context);
                     _pickImage(ImageSource.camera);
@@ -127,7 +127,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.tr("post.create_success"))),
+            SnackBar(content: Text("post.create_success".tr())),
           );
           context.go('/profile'); // Redirection vers la page de profil
         }
@@ -144,7 +144,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
       }
     } else if (!hasImage) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.tr("post.media_required"))),
+        SnackBar(content: Text("post.media_required".tr())),
       );
     }
   }
@@ -233,7 +233,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                               children: [
                                 const Icon(Icons.add_a_photo, size: 48),
                                 const SizedBox(height: 8),
-                                Text(context.tr("post.add_photo")),
+                                Text("post.add_photo".tr()),
                               ],
                             ),
                           ),
@@ -245,12 +245,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     TextFormField(
                       controller: _titleController,
                       decoration: InputDecoration(
-                        labelText: context.tr("post.title"),
+                        labelText: ("post.title".tr()),
                         border: const OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return context.tr("post.title_required");
+                          return ("post.title_required".tr());
                         }
                         return null;
                       },
@@ -261,7 +261,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     TextFormField(
                       controller: _descriptionController,
                       decoration: InputDecoration(
-                        labelText: context.tr("post.description"),
+                        labelText: ("post.description".tr()),
                         border: const OutlineInputBorder(),
                       ),
                       maxLines: 4,
@@ -270,8 +270,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
                     // Switch contenu payant
                     SwitchListTile(
-                      title: Text(context.tr("post.paid_content")),
-                      subtitle: Text(context.tr("post.paid_content_desc")),
+                      title: Text("post.paid_content".tr()),
+                      subtitle: Text("post.paid_content_desc".tr()),
                       value: _isPaid,
                       onChanged: (bool value) {
                         setState(() {
@@ -287,7 +287,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: Text(context.tr("post.publish")),
+                      child: Text("post.publish".tr()),
                     ),
                   ],
                 ),
