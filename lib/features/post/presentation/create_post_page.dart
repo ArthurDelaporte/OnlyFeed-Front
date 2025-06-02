@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
-import 'package:onlyfeed_frontend/core/widgets/scaffold_with_header.dart';
+import 'package:onlyfeed_frontend/core/widgets/scaffold_with_menubar.dart';
 import 'package:onlyfeed_frontend/features/post/services/post_service.dart';
 import 'package:provider/provider.dart';
 import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart';
@@ -166,8 +166,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldWithHeader(
-      title: context.tr("post.create_post"),
+    return ScaffoldWithMenubar(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -241,7 +240,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         ),
                       ),
                     const SizedBox(height: 16),
-                    
+
                     // Champ titre
                     TextFormField(
                       controller: _titleController,
@@ -257,7 +256,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Champ description
                     TextFormField(
                       controller: _descriptionController,
@@ -268,7 +267,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       maxLines: 4,
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Switch contenu payant
                     SwitchListTile(
                       title: Text(context.tr("post.paid_content")),
@@ -281,7 +280,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // Bouton de soumission
                     ElevatedButton(
                       onPressed: _submitPost,
