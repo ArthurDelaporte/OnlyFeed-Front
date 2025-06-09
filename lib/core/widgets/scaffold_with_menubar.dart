@@ -8,9 +8,8 @@ import 'package:onlyfeed_frontend/shared/shared.dart';
 enum SidebarItem {
   home,
   search,
+  create,
   chats,
-  language,
-  theme,
   profile,
   login,
 }
@@ -28,6 +27,7 @@ class ScaffoldWithMenubar extends StatefulWidget {
 }
 
 class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
+  final _dio = DioClient().dio;
   final _searchCtrl = TextEditingController();
   final _searchFocusNode = FocusNode();
 
@@ -58,6 +58,19 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
     locale.setLocale(newLocale);
   }
 
+  Future<void> _logout() async {
+    try {
+      await _dio.post('/api/auth/logout');
+      await TokenManager.clear();
+      context.read<SessionNotifier>().clearUser();
+      if (mounted) context.go('/');
+    } catch (_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("core.error".tr())),
+      );
+    }
+  }
+
   void _handleTap(SidebarItem selected, String? username) {
     switch (selected) {
       case SidebarItem.home:
@@ -83,16 +96,13 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
           _searchFocusNode.requestFocus();
         });
         break;
+      case SidebarItem.create:
+        context.go('/$username/create');
+        break;
       case SidebarItem.chats:
         break;
       case SidebarItem.profile:
         context.go('/$username');
-        break;
-      case SidebarItem.language:
-        _toggleLocale();
-        break;
-      case SidebarItem.theme:
-        _toggleTheme();
         break;
       case SidebarItem.login:
         context.go('/account/login');
@@ -114,31 +124,22 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
     final items = <SidebarItem>[
       SidebarItem.home,
       SidebarItem.search,
-      if (session.isAuthenticated) SidebarItem.chats,
-      if (!isMobile) ...[
-        SidebarItem.language,
-        SidebarItem.theme,
-      ],
-      if (session.isAuthenticated)
+      if (session.isAuthenticated) ...[
+        SidebarItem.create,
+        SidebarItem.chats,
         SidebarItem.profile
+      ]
       else SidebarItem.login,
     ];
 
     PreferredSizeWidget mobileAppBar() {
       return AppBar(
         title: Text("OnlyFeed", style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: false,
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         actionsPadding: EdgeInsets.only(right: 16),
         actions: [
-          IconButton(
-            icon: _buildIcon(SidebarItem.language, themeMode, languageCode),
-            onPressed: _toggleLocale,
-          ),
-          SizedBox(width: 8),
-          IconButton(
-            icon: _buildIcon(SidebarItem.theme, themeMode, languageCode),
-            onPressed: _toggleTheme,
-          ),
+          _buildPopupMenu()
         ],
       );
     }
@@ -155,7 +156,13 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
         padding: EdgeInsets.fromLTRB(12, 24, 12, 0),
         icon: _buildIcon(item, themeMode, languageCode),
         label: width >= sizeMinLabelIcon
-          ? Center(child: Text(_buildLabel(item, locale), textAlign: TextAlign.center))
+          ? Center(
+            child: Text(
+              _buildLabel(item, locale),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12, fontFamily: 'Inter', color: Theme.of(context).colorScheme.onSurface),
+            )
+          )
           : const SizedBox.shrink(),
       );
     }).toList();
@@ -173,9 +180,7 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
               data: NavigationBarThemeData(
                 height: 80,
                 labelTextStyle: WidgetStateProperty.all(TextStyle(fontSize: 0)),
-                iconTheme: WidgetStateProperty.all(
-                  IconThemeData(size: 32),
-                ),
+                iconTheme: WidgetStateProperty.all(IconThemeData(size: 32)),
               ),
               child: NavigationBar(
                 destinations: bottomDestinations,
@@ -192,17 +197,39 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
         width: 120,
         child: FocusScope(
           canRequestFocus: false,
-          child: NavigationRail(
-            labelType: width >= sizeMinLabelIcon
-              ? NavigationRailLabelType.all
-              : NavigationRailLabelType.none,
-            selectedIndex: null,
-            useIndicator: false,
-            destinations: railDestinations,
-            onDestinationSelected: (i) => _handleTap(items[i], username),
-            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-            groupAlignment: -1.0,
-          ),
+          child: Container(
+            color: Theme.of(context).appBarTheme.backgroundColor,
+            child: Column(
+              children: [
+                Expanded(
+                  child: NavigationRail(
+                    labelType: width >= sizeMinLabelIcon
+                        ? NavigationRailLabelType.all
+                        : NavigationRailLabelType.none,
+                    selectedIndex: null,
+                    useIndicator: false,
+                    destinations: railDestinations,
+                    onDestinationSelected: (i) => _handleTap(items[i], username),
+                    backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+                    groupAlignment: -1.0,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 24),
+                  child: Column(
+                    children: [
+                      _buildPopupMenu(),
+                      if (MediaQuery.of(context).size.width >= sizeMinLabelIcon)
+                        Text(
+                          "core.more".tr().capitalize(),
+                          style: TextStyle(fontSize: 12, fontFamily: 'Inter', color: Theme.of(context).colorScheme.onSurface),
+                        ),
+                    ],
+                  )
+                )
+              ],
+            ),
+          )
         ),
       );
 
@@ -231,24 +258,12 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
         return const Icon(Icons.home_filled);
       case SidebarItem.search:
         return const Icon(Icons.search_rounded);
+      case SidebarItem.create:
+        return Icon(Icons.add_box_outlined);
       case SidebarItem.chats:
         return const Icon(Icons.send_rounded);
       case SidebarItem.profile:
         return const Icon(Icons.person_rounded);
-      case SidebarItem.language:
-        return Image.asset(
-          'assets/img/flags/$languageCode.jpg',
-          width: 32,
-          height: 32,
-        );
-      case SidebarItem.theme:
-        return Icon(
-          themeMode == ThemeMode.dark
-              ? Icons.dark_mode
-              : themeMode == ThemeMode.light
-              ? Icons.light_mode
-              : Icons.computer,
-        );
       case SidebarItem.login:
         return const Icon(Icons.login_rounded);
     }
@@ -259,17 +274,77 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
       case SidebarItem.home:
         return "app.title".tr();
       case SidebarItem.search:
-        return "user.search.search_user".tr();
+        return "user.search.search".tr().capitalize();
+      case SidebarItem.create:
+        return "post.create".tr().capitalize();
       case SidebarItem.chats:
         return "chat.messages".tr().capitalize();
       case SidebarItem.profile:
         return "user.profile".tr();
-      case SidebarItem.language:
-        return locale.languageCode.toUpperCase();
-      case SidebarItem.theme:
-        return "user.theme.${context.read<ThemeNotifier>().themeMode}".tr().capitalize();
       case SidebarItem.login:
         return "user.log.login".tr().capitalize();
     }
+  }
+
+  Widget _buildPopupMenu() {
+    final themeMode = context.watch<ThemeNotifier>().themeMode;
+    final locale = context.watch<LocaleNotifier>().locale;
+    final session = context.watch<SessionNotifier>();
+    final languageCode = locale.languageCode;
+
+    return PopupMenuButton<String>(
+      onSelected: (value) {
+        if (value == 'lang') _toggleLocale();
+        if (value == 'theme') _toggleTheme();
+        if (value == 'logout') _logout();
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: 'lang',
+          child: Row(
+            children: [
+              Image.asset(
+                'assets/img/flags/$languageCode.jpg',
+                width: 32,
+                height: 32,
+              ),
+              SizedBox(width: 8),
+              Text(languageCode.toUpperCase()),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 'theme',
+          child: Row(
+            children: [
+              Icon(
+                themeMode == ThemeMode.dark
+                  ? Icons.dark_mode
+                  : themeMode == ThemeMode.light
+                  ? Icons.light_mode
+                  : Icons.computer,
+              ),
+              SizedBox(width: 8),
+              Text('user.theme.${themeMode.name}'.tr().capitalize()),
+            ],
+          ),
+        ),
+        if (session.isAuthenticated)
+          PopupMenuItem(
+            value: 'logout',
+            child: Row(
+              children: [
+                Icon(Icons.logout),
+                SizedBox(width: 8),
+                Text('user.log.logout'.tr().capitalize()),
+              ],
+            ),
+          ),
+      ],
+      icon: Icon(Icons.dehaze_rounded),
+      iconSize: 32,
+      iconColor: Theme.of(context).colorScheme.onSurface,
+      tooltip: "core.more".tr().capitalize(),
+    );
   }
 }

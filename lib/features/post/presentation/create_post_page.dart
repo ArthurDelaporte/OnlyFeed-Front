@@ -11,10 +11,11 @@ import 'package:provider/provider.dart';
 import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart';
 
 class CreatePostPage extends StatefulWidget {
-  const CreatePostPage({Key? key}) : super(key: key);
+  final String username;
+  const CreatePostPage({super.key, required this.username});
 
   @override
-  _CreatePostPageState createState() => _CreatePostPageState();
+  State<CreatePostPage> createState() => _CreatePostPageState();
 }
 
 class _CreatePostPageState extends State<CreatePostPage> {
@@ -129,7 +130,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("post.create_success".tr())),
           );
-          context.go('/profile'); // Redirection vers la page de profil
+          context.go('/${widget.username}', extra: {'refresh': true}); // Redirection vers la page de profil
         }
       } catch (e) {
         setState(() {
@@ -188,7 +189,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                               _mediaFile!,
                               width: double.infinity,
                               height: 200,
-                              fit: BoxFit.cover,
+                              fit: BoxFit.contain,
                             ),
                           ),
                           IconButton(
@@ -208,7 +209,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                               _webImageBytes!,
                               width: double.infinity,
                               height: 200,
-                              fit: BoxFit.cover,
+                              fit: BoxFit.contain,
                             ),
                           ),
                           IconButton(

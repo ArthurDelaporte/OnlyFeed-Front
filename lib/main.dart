@@ -6,7 +6,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:onlyfeed_frontend/app.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
-import 'package:onlyfeed_frontend/shared/utils/platform/web_event_listener.dart';
 import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart';
 
 void main() async {
@@ -15,6 +14,9 @@ void main() async {
   await dotenv.load();
 
   setUrlStrategy(PathUrlStrategy());
+
+  final sessionNotifier = SessionNotifier();
+  await sessionNotifier.refreshUser();
 
   runApp(
     EasyLocalization(
@@ -27,7 +29,7 @@ void main() async {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => LocaleNotifier()),
-          ChangeNotifierProvider(create: (_) => SessionNotifier()),
+          ChangeNotifierProvider(create: (_) => sessionNotifier), // 👈 injecté après refresh
           ChangeNotifierProvider(create: (_) => ThemeNotifier()),
           ChangeNotifierProvider(create: (_) => PostProvider()),
         ],
@@ -48,14 +50,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-
-    // 🔄 Web only: listen to changes from other tabs
-    setupWebStorageListener(() {
-      context.read<SessionNotifier>().refreshUser();
-    });
-
-    // 🔄 Initialiser la session au démarrage
-    context.read<SessionNotifier>().refreshUser();
   }
 
   @override

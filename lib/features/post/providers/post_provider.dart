@@ -93,4 +93,18 @@ class PostProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> fetchUserPostsByUsername(String username) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _userPosts = await _postService.getPostsByUsername(username);
+    } catch (e) {
+      print('Error fetching posts for user $username: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }

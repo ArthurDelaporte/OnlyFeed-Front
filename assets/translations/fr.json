@@ -4,7 +4,10 @@
     "welcome": "Bienvenue sur OnlyFeed 👋"
   },
   "core": {
-    "error": "erreur"
+    "error": "erreur",
+    "more": "plus",
+    "less": "moins",
+    "including": "dont"
   },
   "user": {
     "profile": "profil",
@@ -54,17 +57,17 @@
     },
     "theme": {
       "change_theme": "Changer de thème",
-      "ThemeMode": {
-        "light": "mode clair",
-        "dark": "mode sombre",
-        "system": "mode du système"
-      }
+      "light": "mode clair",
+      "dark": "mode sombre",
+      "system": "mode du système"
     },
     "search": {
+      "search": "recherche",
       "search_user": "Rechercher un utilisateur"
     }
   },
   "post": {
+    "create": "créer",
     "create_post": "Créer un nouveau post",
     "title": "Titre",
     "title_required": "Le titre est obligatoire",
@@ -82,6 +85,18 @@
     "no_posts_yet": "Vous n'avez pas encore publié de contenu"
   },
   "chat": {
+    "message": "message",
     "messages": "messages"
+  },
+  "profile_page": {
+    "followers": "followers",
+    "posts": "publications",
+    "subscribers": "abonné(e)s",
+    "premium_posts": "publications premium",
+    "premium": "premium",
+    "following": "suivi(e)",
+    "follow": "suivre",
+    "subscribed": "abonné(e)",
+    "subscribe": "s'abonner"
   }
 }

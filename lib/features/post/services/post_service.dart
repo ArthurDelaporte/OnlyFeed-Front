@@ -83,8 +83,12 @@ class PostService {
     }
   }
 
-  // Les autres méthodes restent inchangées
-  
+  Future<List<Post>> getPostsByUsername(String username) async {
+    final response = await DioClient().dio.get('/api/users/username/$username/posts');
+    final postsData = response.data['posts'] as List;
+    return postsData.map((json) => Post.fromJson(json)).toList();
+  }
+
   // Créer un nouveau post (pour mobile)
   Future<Post> createPost({
     required String title,
