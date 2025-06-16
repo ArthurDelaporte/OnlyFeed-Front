@@ -63,10 +63,18 @@ class _ProfilePageState extends State<ProfilePage> {
       final response = await _dio.get('/api/users/username/${widget.username}');
       _user = response.data['user'];
       final stats = response.data['stats'];
-      followersCount = int.parse(stats["followers_count"] ?? "0");
-      subscribersCount = int.parse(stats["subscribers_count"] ?? "0");
-      postsCount = int.parse(stats["posts_count"] ?? "0");
-      paidPostsCount = int.parse(stats["paid_posts_count"] ?? "0");
+      followersCount = stats["followers_count"] is int
+          ? stats["followers_count"]
+          : int.tryParse(stats["followers_count"] ?? "0") ?? 0;
+      subscribersCount = stats["subscribers_count"] is int
+          ? stats["subscribers_count"]
+          : int.tryParse(stats["subscribers_count"] ?? "0") ?? 0;
+      postsCount = stats["posts_count"] is int
+          ? stats["posts_count"]
+          : int.tryParse(stats["posts_count"] ?? "0") ?? 0;
+      paidPostsCount = stats["paid_posts_count"] is int
+          ? stats["paid_posts_count"]
+          : int.tryParse(stats["paid_posts_count"] ?? "0") ?? 0;
       _isFollowing = response.data['is_following'];
     } catch (e) {
       _user = null;
