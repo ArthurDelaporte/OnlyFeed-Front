@@ -9,6 +9,7 @@ import 'package:onlyfeed_frontend/core/widgets/scaffold_with_menubar.dart';
 import 'package:onlyfeed_frontend/features/post/services/post_service.dart';
 import 'package:provider/provider.dart';
 import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart';
+import 'package:onlyfeed_frontend/shared/shared.dart';
 
 class CreatePostPage extends StatefulWidget {
   final String username;
@@ -167,6 +168,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   @override
   Widget build(BuildContext context) {
+    final session = context.watch<SessionNotifier>();
+    final user = session.user;
+    final isCreator = user?["is_creator"];
     return ScaffoldWithMenubar(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -267,19 +271,23 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       ),
                       maxLines: 4,
                     ),
-                    const SizedBox(height: 16),
 
-                    // Switch contenu payant
-                    SwitchListTile(
-                      title: Text("post.paid_content".tr()),
-                      subtitle: Text("post.paid_content_desc".tr()),
-                      value: _isPaid,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _isPaid = value;
-                        });
-                      },
-                    ),
+                    if (isCreator) ...[
+                      const SizedBox(height: 16),
+
+                      // Switch contenu payant
+                      SwitchListTile(
+                        title: Text("post.paid_content".tr()),
+                        subtitle: Text("post.paid_content_desc".tr()),
+                        value: _isPaid,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _isPaid = value;
+                          });
+                        },
+                      ),
+                    ],
+
                     const SizedBox(height: 24),
 
                     // Bouton de soumission
