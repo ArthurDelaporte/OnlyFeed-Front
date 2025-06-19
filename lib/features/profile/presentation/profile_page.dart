@@ -7,6 +7,7 @@ import 'package:onlyfeed_frontend/core/widgets/scaffold_with_menubar.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 import 'package:onlyfeed_frontend/features/post/widgets/post_grid.dart';
 import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePage extends StatefulWidget {
   final String username;
@@ -126,11 +127,84 @@ class _ProfilePageState extends State<ProfilePage> {
     return text.trim().length > 100;
   }
 
+  Future<void> _onConnectStripe() async {
+    try {
+      final response = await _dio.post('/api/stripe/create-account-link');
+
+      final url = response.data['url'];
+      if (url != null && await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      debugPrint('Erreur Stripe Connect: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Une erreur est survenue lors de la connexion à Stripe.")),
+      );
+    }
+  }
+
+  void showBecomeCreatorDialog(BuildContext context, Future<void> Function() onConfirm) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[900]
+              : Theme.of(context).dialogBackgroundColor,
+          surfaceTintColor: Colors.transparent,
+          title: Text(
+            "profile_page.become_creator".tr(),
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("profile_page.become_creator_dialog.why".tr(), style: TextStyle(fontWeight: FontWeight.bold),),
+                SizedBox(height: 12),
+                Text("profile_page.become_creator_dialog.exclusive_content".tr()),
+                SizedBox(height: 12),
+                Text("profile_page.become_creator_dialog.commission".tr()),
+                SizedBox(height: 24),
+                Text("profile_page.become_creator_dialog.next_steps".tr(), style: TextStyle(fontWeight: FontWeight.bold),),
+                SizedBox(height: 12),
+                Text("- ${"profile_page.become_creator_dialog.stripe_redirected".tr()}"),
+                SizedBox(height: 12),
+                Text("- ${"profile_page.become_creator_dialog.stripe_informations".tr()}"),
+                SizedBox(height: 12),
+                Text("- ${"profile_page.become_creator_dialog.stripe_website".tr()}"),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                shape: StadiumBorder(),
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+              child: Text("profile_page.become_creator_dialog.not_becoming_creator".tr()),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await onConfirm();
+              },
+              child: Text("profile_page.become_creator".tr()),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildHeader() {
     final bio = _user?['bio'] ?? '';
 
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      padding: EdgeInsets.fromLTRB(16, 0, 16, 24),
       child: SizedBox(
         width: 400,
         child: Column(
@@ -206,6 +280,16 @@ class _ProfilePageState extends State<ProfilePage> {
                       padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     ),
                   ),
+                  if (_user?['is_creator'] != true) ...[
+                    SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        showBecomeCreatorDialog(context, _onConnectStripe);
+                      },
+                      child: Text("profile_page.become_creator".tr().capitalize()),
+                    )
+                  ],
+
                 ] else if (_isAuthenticated) ...[
                   ElevatedButton.icon(
                     onPressed: _toggleFollow,
@@ -304,9 +388,9 @@ class _ProfilePageState extends State<ProfilePage> {
           physics: AlwaysScrollableScrollPhysics(),
           child: Container(
             width: double.infinity,
+            height: double.maxFinite,
             padding: EdgeInsets.all(24),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildHeader(),
                 Text("post.my_posts".tr(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
@@ -357,4 +441,3 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
-

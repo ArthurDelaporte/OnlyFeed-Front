@@ -11,6 +11,7 @@
   },
   "user": {
     "profile": "profile",
+    "back_profile": "Back to profile",
     "not_found": "User not found",
     "field": {
       "email": "email",
@@ -97,6 +98,19 @@
     "following": "following",
     "follow": "follow",
     "subscribed": "subscribed",
-    "subscribe": "subscribe"
+    "subscribe": "subscribe",
+    "become_creator": "Become creator",
+    "success": "You are now a designer",
+    "error": "An error occurred when registering with Stripe.",
+    "become_creator_dialog": {
+      "why": "Why become a creator?",
+      "exclusive_content": "By becoming a creator, you can publish exclusive content accessible only to paying subscribers.",
+      "commission": "Users can subscribe to your paid content each month. OnlyFeed takes a commission for each subscription.",
+      "next_steps": "Here are the next steps in becoming a creator:",
+      "stripe_redirected": "You will be redirected to Stripe to create an account.",
+      "stripe_informations": "Stripe will ask you for legal information (SIRET, RIB/IBAN, etc.) to pay you your winnings.",
+      "stripe_website": "Stripe will also ask you for a website. You can use your OnlyFeed profile page.",
+      "not_becoming_creator": "Not becoming a creator"
+    }
   }
 }

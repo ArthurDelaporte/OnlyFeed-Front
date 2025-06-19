@@ -11,6 +11,7 @@
   },
   "user": {
     "profile": "profil",
+    "back_profile": "Retour au profil",
     "not_found": "Utilisateur introuvable",
     "field": {
       "email": "email",
@@ -97,6 +98,19 @@
     "following": "suivi(e)",
     "follow": "suivre",
     "subscribed": "abonné(e)",
-    "subscribe": "s'abonner"
+    "subscribe": "s'abonner",
+    "become_creator": "Devenir créateur",
+    "success": "Vous êtes désormais créateur",
+    "error": "Une erreur est survenue pendant l'inscription à Stripe.",
+    "become_creator_dialog": {
+      "why": "Pourquoi devenir créateur ?",
+      "exclusive_content": "En devenant créateur, vous pouvez publier du contenu exclusif accessible uniquement aux abonnés payants.",
+      "commission": "Les utilisateurs peuvent s'abonner à votre contenu payant chaque mois. OnlyFeed prend une commission pour chaque abonnement.",
+      "next_steps": "Voici les prochaines étapes pour devenir créateur :",
+      "stripe_redirected": "Vous allez être redirigé vers Stripe pour créer un compte.",
+      "stripe_informations": "Stripe vous demandera des informations légales (SIRET, RIB/IBAN, etc.) pour vous verser vos gains.",
+      "stripe_website": "Stripe vous demandera également un site web. Vous pouvez utiliser votre page profil OnlyFeed.",
+      "not_becoming_creator": "Ne pas devenir créateur"
+    }
   }
 }

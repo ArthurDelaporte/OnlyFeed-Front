@@ -8,6 +8,8 @@ import 'package:onlyfeed_frontend/features/profile/presentation/profile_page.dar
 import 'package:onlyfeed_frontend/features/profile/presentation/edit_profile_page.dart';
 import 'package:onlyfeed_frontend/features/post/presentation/create_post_page.dart';
 import 'package:onlyfeed_frontend/shared/notifiers/session_notifier.dart';
+import 'features/creator/presentation/become_creator_error_page.dart';
+import 'features/creator/presentation/become_creator_success_page.dart';
 
 class OnlyFeedApp {
   static final router = GoRouter(
@@ -56,6 +58,17 @@ class OnlyFeedApp {
             }
           ),
         ]
+      ),
+      GoRoute(
+        path: '/become-creator/success',
+        builder: (context, state) {
+          final accountId = state.uri.queryParameters['account_id'];
+          return BecomeCreatorSuccessPage(accountId: accountId);
+        },
+      ),
+      GoRoute(
+        path: '/become-creator/error',
+        builder: (context, state) => BecomeCreatorErrorPage(),
       ),
     ],
   );
