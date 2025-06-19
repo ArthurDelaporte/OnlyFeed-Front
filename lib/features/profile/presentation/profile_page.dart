@@ -384,59 +384,63 @@ class _ProfilePageState extends State<ProfilePage> {
     return ScaffoldWithMenubar(
       body: RefreshIndicator(
         onRefresh: () async => await _initProfile(),
-        child: SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
-          child: Container(
-            width: double.infinity,
-            height: double.maxFinite,
-            padding: EdgeInsets.all(24),
-            child: Column(
-              children: [
-                _buildHeader(),
-                Text("post.my_posts".tr(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+        child: Expanded(
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(24),
+                child: Column(
                   children: [
+                    _buildHeader(),
+                    Text("post.my_posts".tr(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 16),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          formatNumber(postsCount),
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontWeight: FontWeight.bold
-                          )
+                        Row(
+                          children: [
+                            Text(
+                              formatNumber(postsCount),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Theme.of(context).colorScheme.secondary,
+                                fontWeight: FontWeight.bold
+                              )
+                            ),
+                            SizedBox(width: 4),
+                            Text("profile_page.posts".tr(), style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                          ],
                         ),
-                        SizedBox(width: 4),
-                        Text("profile_page.posts".tr(), style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                        SizedBox(width: 16),
+                        Row(
+                          children: [
+                            Text("core.including".tr(), style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                            SizedBox(width: 4),
+                            Text(
+                              formatNumber(paidPostsCount),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold
+                              )
+                            ),
+                            SizedBox(width: 4),
+                            Text("profile_page.premium".tr(), style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                          ],
+                        ),
                       ],
                     ),
-                    SizedBox(width: 16),
-                    Row(
-                      children: [
-                        Text("core.including".tr(), style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                        SizedBox(width: 4),
-                        Text(
-                          formatNumber(paidPostsCount),
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.bold
-                          )
-                        ),
-                        SizedBox(width: 4),
-                        Text("profile_page.premium".tr(), style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                      ],
-                    ),
+                    SizedBox(height: 16),
+                    PostGrid(posts: posts, isLoading: isLoadingPosts),
                   ],
                 ),
-                SizedBox(height: 16),
-                PostGrid(posts: posts, isLoading: isLoadingPosts),
-              ],
+              ),
             ),
-          ),
-        ),
+          )
+        )
       ),
     );
   }
