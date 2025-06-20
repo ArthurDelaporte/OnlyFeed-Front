@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordCtrl = TextEditingController();
   final _dio = DioClient().dio;
 
-  void _login() async {
+  void _login(BuildContext context) async {
     try {
       final hashedPassword = sha256.convert(utf8.encode(_passwordCtrl.text)).toString();
 
@@ -40,7 +40,12 @@ class _LoginPageState extends State<LoginPage> {
           await TokenManager.saveBoth(accessToken, refreshToken);
           context.read<SessionNotifier>().setUser(user);
 
+          final language = user['language'];
           final theme = user['theme'];
+          if (language != null) {
+            await context.setLocale(Locale(language));
+            context.read<LocaleNotifier>().setLocale(Locale(language));
+          }
           if (theme != null) {
             context.read<ThemeNotifier>().setTheme(parseThemeMode(theme));
           }
@@ -85,11 +90,11 @@ class _LoginPageState extends State<LoginPage> {
                 decoration: InputDecoration(labelText: 'user.field.password'.tr().capitalize()),
                 obscureText: true,
                 textInputAction: TextInputAction.done,
-                onSubmitted: (_) => _login()
+                onSubmitted: (_) => _login(context)
             ),
             SizedBox(height: 20),
             ElevatedButton(
-                onPressed: _login,
+                onPressed: () => _login(context),
                 child: Text('user.log.login'.tr().capitalize())
             ),
             SizedBox(height: 20),

@@ -11,3 +11,7 @@ String formatNumber(int n) {
     return n.toString();
   }
 }
+
+String getDecimalSeparator(String locale) {
+  return locale.startsWith('fr') ? ',' : '.';
+}

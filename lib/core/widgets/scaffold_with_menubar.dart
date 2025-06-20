@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -39,7 +40,7 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
     }
   }
 
-  void _toggleTheme() {
+  Future<void> _toggleTheme() async {
     final themeNotifier = context.read<ThemeNotifier>();
     final current = themeNotifier.themeMode;
     final next = current == ThemeMode.light
@@ -48,14 +49,22 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
         ? ThemeMode.system
         : ThemeMode.light;
     themeNotifier.setTheme(next);
+    await _dio.put(
+      '/api/me',
+      data: FormData.fromMap({'theme': next.name}),
+    );
   }
 
-  void _toggleLocale() async {
+  Future<void> _toggleLocale() async {
     final locale = context.read<LocaleNotifier>();
     final newLocale =
-    locale.locale.languageCode == 'fr' ? const Locale('en') : const Locale('fr');
+    locale.locale.languageCode == 'fr' ? Locale('en') : Locale('fr');
     await context.setLocale(newLocale);
     locale.setLocale(newLocale);
+    await _dio.put(
+      '/api/me',
+      data: FormData.fromMap({'language': newLocale.languageCode}),
+    );
   }
 
   Future<void> _logout() async {

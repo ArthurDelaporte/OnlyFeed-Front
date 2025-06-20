@@ -7,7 +7,9 @@
     "error": "erreur",
     "more": "plus",
     "less": "moins",
-    "including": "dont"
+    "including": "dont",
+    "open": "ouvrir",
+    "close": "fermer"
   },
   "user": {
     "profile": "profil",
@@ -21,6 +23,7 @@
       "lastname": "nom",
       "bio": "bio",
       "profile_picture": "photo de profil",
+      "subscription_price": "prix d'abonnement",
       "fields_required": "Les champs email, mot de passe et nom d'utilisateur sont obligatoires.",
       "profile_picture_invalid": "Format de photo invalide. Formats acceptés : JPG, PNG, WebP, HEIC."
     },
@@ -91,8 +94,10 @@
   },
   "profile_page": {
     "followers": "followers",
-    "posts": "publications",
     "subscribers": "abonné(e)s",
+    "followups": "suivi(e)s",
+    "subscriptions": "abonnements",
+    "posts": "publications",
     "premium_posts": "publications premium",
     "premium": "premium",
     "following": "suivi(e)",
@@ -105,7 +110,9 @@
     "become_creator_dialog": {
       "why": "Pourquoi devenir créateur ?",
       "exclusive_content": "En devenant créateur, vous pouvez publier du contenu exclusif accessible uniquement aux abonnés payants.",
-      "commission": "Les utilisateurs peuvent s'abonner à votre contenu payant chaque mois. OnlyFeed prend une commission pour chaque abonnement.",
+      "monthly": "Les utilisateurs peuvent s'abonner mensuellement à votre contenu payant.",
+      "sub_price": "Par défaut, l'abonnement est à 5€, mais le montant peut être modifié à n'importe quel moment.",
+      "commission": "OnlyFeed prend une commission de 20% pour chaque abonnement.",
       "next_steps": "Voici les prochaines étapes pour devenir créateur :",
       "stripe_redirected": "Vous allez être redirigé vers Stripe pour créer un compte.",
       "stripe_informations": "Stripe vous demandera des informations légales (SIRET, RIB/IBAN, etc.) pour vous verser vos gains.",

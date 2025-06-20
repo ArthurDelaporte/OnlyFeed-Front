@@ -22,12 +22,15 @@ class _ProfilePageState extends State<ProfilePage> {
   Map<String, dynamic>? _user;
   bool? _isFollowing;
   bool _isOwnProfile = false;
+  bool _isCreator = false;
   bool _isLoading = true;
   bool _shouldRefresh = false;
   bool _showFullBio = false;
   bool _isAuthenticated = false;
   int followersCount = 0;
   int subscribersCount = 0;
+  int followupsCount = 0;
+  int subscriptionsCount = 0;
   int postsCount = 0;
   int paidPostsCount = 0;
 
@@ -70,6 +73,14 @@ class _ProfilePageState extends State<ProfilePage> {
       subscribersCount = stats["subscribers_count"] is int
           ? stats["subscribers_count"]
           : int.tryParse(stats["subscribers_count"] ?? "0") ?? 0;
+
+      followupsCount = stats?["followups_count"] is int
+          ? stats["followups_count"]
+          : int.tryParse(stats["followups_count"] ?? "0") ?? 0;
+      subscriptionsCount = stats?["subscriptions_count"] is int
+          ? stats["subscriptions_count"]
+          : int.tryParse(stats["subscriptions_count"] ?? "0") ?? 0;
+
       postsCount = stats["posts_count"] is int
           ? stats["posts_count"]
           : int.tryParse(stats["posts_count"] ?? "0") ?? 0;
@@ -77,6 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ? stats["paid_posts_count"]
           : int.tryParse(stats["paid_posts_count"] ?? "0") ?? 0;
       _isFollowing = response.data['is_following'];
+      _isCreator = response.data['user']['is_creator'];
     } catch (e) {
       _user = null;
     }
@@ -152,9 +164,19 @@ class _ProfilePageState extends State<ProfilePage> {
               ? Colors.grey[900]
               : Theme.of(context).dialogBackgroundColor,
           surfaceTintColor: Colors.transparent,
-          title: Text(
-            "profile_page.become_creator".tr(),
-            style: TextStyle(fontWeight: FontWeight.bold),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "profile_page.become_creator".tr(),
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () => Navigator.of(context).pop(),
+                tooltip: 'core.close'.tr().capitalize(),
+              ),
+            ],
           ),
           content: SingleChildScrollView(
             child: Column(
@@ -163,6 +185,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 Text("profile_page.become_creator_dialog.why".tr(), style: TextStyle(fontWeight: FontWeight.bold),),
                 SizedBox(height: 12),
                 Text("profile_page.become_creator_dialog.exclusive_content".tr()),
+                SizedBox(height: 12),
+                Text("profile_page.become_creator_dialog.monthly".tr()),
+                SizedBox(height: 12),
+                Text("profile_page.become_creator_dialog.sub_price".tr()),
                 SizedBox(height: 12),
                 Text("profile_page.become_creator_dialog.commission".tr()),
                 SizedBox(height: 24),
@@ -177,16 +203,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           actions: [
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Colors.white,
-                shape: StadiumBorder(),
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              ),
-              child: Text("profile_page.become_creator_dialog.not_becoming_creator".tr()),
-            ),
             ElevatedButton(
               onPressed: () async {
                 Navigator.of(context).pop();
@@ -230,14 +246,26 @@ class _ProfilePageState extends State<ProfilePage> {
                         _user?['username'] ?? '',
                         style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: MediaQuery.of(context).size.width < 768 ? 4 : 16),
                       Row(
                         children: [
                           _buildStatLine(followersCount, 'profile_page.followers'.tr(), Theme.of(context).colorScheme.secondary),
-                          SizedBox(width: 8),
-                          _buildStatLine(subscribersCount, 'profile_page.subscribers'.tr(), Theme.of(context).colorScheme.primary),
+                          if (_isCreator) ...[
+                            SizedBox(width: 8),
+                            _buildStatLine(subscribersCount, 'profile_page.subscribers'.tr(), Theme.of(context).colorScheme.primary),
+                          ]
                         ],
                       ),
+                      if (_isOwnProfile) ...[
+                        SizedBox(height: MediaQuery.of(context).size.width < 768 ? 0 : 4),
+                        Row(
+                          children: [
+                            _buildStatLine(followupsCount, 'profile_page.followups'.tr(), Theme.of(context).colorScheme.secondary),
+                            SizedBox(width: 8),
+                            _buildStatLine(subscriptionsCount, 'profile_page.subscriptions'.tr(), Theme.of(context).colorScheme.primary),
+                          ],
+                        ),
+                      ]
                     ],
                   ),
                 ),
@@ -263,8 +291,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
 
-            if (_isAuthenticated) SizedBox(height: 16),
-
+            SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -290,9 +317,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     )
                   ],
 
-                ] else if (_isAuthenticated) ...[
+                ] else ...[
                   ElevatedButton.icon(
-                    onPressed: _toggleFollow,
+                    onPressed: () { if (_isAuthenticated) _toggleFollow; },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.secondary,
                       foregroundColor: Colors.white,
@@ -300,21 +327,23 @@ class _ProfilePageState extends State<ProfilePage> {
                       padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                     ),
                     label: Text(_isFollowing == true
-                      ? "profile_page.following".tr().capitalize()
-                      : "profile_page.follow".tr().capitalize()
+                        ? "profile_page.following".tr().capitalize()
+                        : "profile_page.follow".tr().capitalize()
                     ),
                   ),
-                  SizedBox(width: 16),
-                  ElevatedButton.icon(
-                    onPressed: () {}, // TODO: abonnement
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      shape: StadiumBorder(),
-                      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  if (_user?['is_creator'] == true) ...[
+                    SizedBox(width: 16),
+                    ElevatedButton.icon(
+                      onPressed: () {}, // TODO: abonnement
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        shape: StadiumBorder(),
+                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                      ),
+                      label: Text("profile_page.subscribe".tr().capitalize()),
                     ),
-                    label: Text("profile_page.subscribe".tr().capitalize()),
-                  ),
+                  ]
                 ]
               ],
             ),
@@ -414,23 +443,25 @@ class _ProfilePageState extends State<ProfilePage> {
                             Text("profile_page.posts".tr(), style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
                           ],
                         ),
-                        SizedBox(width: 16),
-                        Row(
-                          children: [
-                            Text("core.including".tr(), style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                            SizedBox(width: 4),
-                            Text(
-                              formatNumber(paidPostsCount),
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold
-                              )
-                            ),
-                            SizedBox(width: 4),
-                            Text("profile_page.premium".tr(), style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                          ],
-                        ),
+                        if (_isCreator) ...[
+                          SizedBox(width: 16),
+                          Row(
+                            children: [
+                              Text("core.including".tr(), style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                              SizedBox(width: 4),
+                              Text(
+                                formatNumber(paidPostsCount),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold
+                                )
+                              ),
+                              SizedBox(width: 4),
+                              Text("profile_page.premium".tr(), style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                            ],
+                          ),
+                        ]
                       ],
                     ),
                     SizedBox(height: 16),

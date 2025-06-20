@@ -7,7 +7,9 @@
     "error": "error",
     "more": "more",
     "less": "less",
-    "including": "including"
+    "including": "including",
+    "open": "open",
+    "close": "close"
   },
   "user": {
     "profile": "profile",
@@ -21,6 +23,7 @@
       "lastname": "lastname",
       "bio": "bio",
       "profile_picture": "profile picture",
+      "subscription_price": "subscription price",
       "fields_required": "Email, password and username fields are required.",
       "profile_picture_invalid": "Invalid photo format. Allowed formats: JPG, PNG, WebP, HEIC."
     },
@@ -91,8 +94,10 @@
   },
   "profile_page": {
     "followers": "followers",
-    "posts": "posts",
     "subscribers": "subscribers",
+    "followups": "followups",
+    "subscriptions": "subscriptions",
+    "posts": "posts",
     "premium_posts": "premium posts",
     "premium": "premium",
     "following": "following",
@@ -105,7 +110,9 @@
     "become_creator_dialog": {
       "why": "Why become a creator?",
       "exclusive_content": "By becoming a creator, you can publish exclusive content accessible only to paying subscribers.",
-      "commission": "Users can subscribe to your paid content each month. OnlyFeed takes a commission for each subscription.",
+      "monthly": "Users can subscribe to your paid content on a monthly basis.",
+      "sub_price": "By default, the subscription is €5, but the amount can be modified at any time.",
+      "commission": "OnlyFeed takes a 20% commission for each subscription.",
       "next_steps": "Here are the next steps in becoming a creator:",
       "stripe_redirected": "You will be redirected to Stripe to create an account.",
       "stripe_informations": "Stripe will ask you for legal information (SIRET, RIB/IBAN, etc.) to pay you your winnings.",

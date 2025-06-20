@@ -7,6 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onlyfeed_frontend/app.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,9 @@ void main() async {
   final sessionNotifier = SessionNotifier();
   await sessionNotifier.refreshUser();
 
+  final localeNotifier = LocaleNotifier();
+  localeNotifier.initLocale();
+
   runApp(
     EasyLocalization(
       startLocale: Locale('fr'),
@@ -28,8 +32,8 @@ void main() async {
       saveLocale: true,
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => LocaleNotifier()),
-          ChangeNotifierProvider(create: (_) => sessionNotifier), // 👈 injecté après refresh
+          ChangeNotifierProvider(create: (_) => localeNotifier),
+          ChangeNotifierProvider(create: (_) => sessionNotifier),
           ChangeNotifierProvider(create: (_) => ThemeNotifier()),
           ChangeNotifierProvider(create: (_) => PostProvider()),
         ],
@@ -54,10 +58,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final locale = context.watch<LocaleNotifier>().locale;
-
     return MaterialApp.router(
-      locale: locale,
+      locale: context.watch<LocaleNotifier>().locale,
       supportedLocales: context.supportedLocales,
       localizationsDelegates: context.localizationDelegates,
       debugShowCheckedModeBanner: false,
