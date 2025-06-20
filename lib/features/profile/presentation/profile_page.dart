@@ -216,8 +216,14 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(String language) {
     final bio = _user?['bio'] ?? '';
+    final rawPrice = _user?['subscription_price'];
+    final separator = getDecimalSeparator(language);
+    var subscriptionPrice = rawPrice != null
+        ? rawPrice.toString().replaceAll('.', separator)
+        : (separator == ',' ? '5,0' : '5.0');
+    subscriptionPrice = language == 'fr' ? '$subscriptionPrice€' : '€$subscriptionPrice';
 
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 0, 16, 24),
@@ -272,6 +278,37 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
             SizedBox(height: 16),
+
+            if (_isCreator) ...[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "profile_page.subscription_price".tr(),
+                    style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary),
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    subscriptionPrice,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    "profile_page.by_month".tr(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+            ],
 
             if (bio.isNotEmpty)
               Column(
@@ -376,7 +413,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         )
         : Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               formatNumber(value),
@@ -423,7 +460,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 padding: EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    _buildHeader(),
+                    _buildHeader(locale.languageCode),
                     Text("post.my_posts".tr(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     SizedBox(height: 16),
                     Row(

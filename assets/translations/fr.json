@@ -97,6 +97,8 @@
     "subscribers": "abonné(e)s",
     "followups": "suivi(e)s",
     "subscriptions": "abonnements",
+    "subscription_price": "Prix de l'abonnement :",
+    "by_month": "par mois",
     "posts": "publications",
     "premium_posts": "publications premium",
     "premium": "premium",
