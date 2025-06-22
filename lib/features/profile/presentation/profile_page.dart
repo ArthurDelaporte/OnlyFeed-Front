@@ -21,12 +21,14 @@ class _ProfilePageState extends State<ProfilePage> {
   final _dio = DioClient().dio;
   Map<String, dynamic>? _user;
   bool? _isFollowing;
+  bool? _isSubscriber;
   bool _isOwnProfile = false;
   bool _isCreator = false;
   bool _isLoading = true;
   bool _shouldRefresh = false;
   bool _showFullBio = false;
   bool _isAuthenticated = false;
+  double? _subscriptionPrice = 0.0;
   int followersCount = 0;
   int subscribersCount = 0;
   int followupsCount = 0;
@@ -37,7 +39,19 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _initProfile();
+    _initProfile().then((_) => {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_isAuthenticated) {
+          if (!_isOwnProfile) {
+            if (_isCreator) {
+              _handleSubscribeFeedback();
+            }
+          } else {
+            _handleBecomeCreatorFeedback();
+          }
+        }
+      })
+    });
   }
 
   @override
@@ -88,7 +102,9 @@ class _ProfilePageState extends State<ProfilePage> {
           ? stats["paid_posts_count"]
           : int.tryParse(stats["paid_posts_count"] ?? "0") ?? 0;
       _isFollowing = response.data['is_following'];
+      _isSubscriber = response.data['is_subscriber'];
       _isCreator = response.data['user']['is_creator'];
+      _subscriptionPrice = _isCreator ? response.data['subscription_price'] : null;
     } catch (e) {
       _user = null;
     }
@@ -109,6 +125,52 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     setState(() => _isLoading = false);
+  }
+
+  void _handleSubscribeFeedback() {
+    final uri = Uri.base;
+    final subscribeStatus = uri.queryParameters['subscribe'];
+
+    if (['success', 'error'].contains(subscribeStatus)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("profile_page.subscription_$subscribeStatus".tr())),
+      );
+    }
+  }
+
+  Future<void> _handleBecomeCreatorFeedback() async {
+    final uri = Uri.base;
+    final becomeCreatorStatus = uri.queryParameters['become_creator'];
+
+    if (becomeCreatorStatus == 'success') {
+      final accountId = uri.queryParameters['account_id'];
+      if (accountId == null || accountId == "") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("${'profile_page.become_creator_error'.tr()} : ${'core.missing_parameter'.tr()}")),
+        );
+      } else {
+        try {
+          await _dio.get("/api/stripe/complete-connect", queryParameters: {
+            "account_id": accountId,
+          });
+
+          await context.read<SessionNotifier>().refreshUser();
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("profile_page.become_creator_success".tr())),
+          );
+          _initProfile();
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("${'core.error_occurred'.tr()} : $e")),
+          );
+        }
+      }
+    } else if (becomeCreatorStatus == 'error') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("${'profile_page.become_creator_error'.tr()}.")),
+      );
+    }
   }
 
   Future<void> _toggleFollow() async {
@@ -132,6 +194,23 @@ class _ProfilePageState extends State<ProfilePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("core.error".tr())),
       );
+    }
+  }
+
+  Future<void> subscribeToCreator() async {
+    final userId = _user?['id'];
+
+    try {
+      final response = await _dio.post('/api/stripe/create-subscription-session/$userId');
+
+      final url = response.data['url'];
+      if (url != null && await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      } else {
+        throw Exception("URL de session Stripe invalide");
+      }
+    } catch (e) {
+      print("Erreur lors de l’abonnement : $e");
     }
   }
 
@@ -218,10 +297,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildHeader(String language) {
     final bio = _user?['bio'] ?? '';
-    final rawPrice = _user?['subscription_price'];
     final separator = getDecimalSeparator(language);
-    var subscriptionPrice = rawPrice != null
-        ? rawPrice.toString().replaceAll('.', separator)
+    var subscriptionPrice = _subscriptionPrice != null
+        ? _subscriptionPrice.toString().replaceAll('.', separator)
         : (separator == ',' ? '5,0' : '5.0');
     subscriptionPrice = language == 'fr' ? '$subscriptionPrice€' : '€$subscriptionPrice';
 
@@ -284,7 +362,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    "profile_page.subscription_price".tr(),
+                    "profile_page.subscription_price${_isSubscriber == true ? "_paid" : ""}".tr(),
                     style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary),
                   ),
                   SizedBox(width: 4),
@@ -350,13 +428,19 @@ class _ProfilePageState extends State<ProfilePage> {
                       onPressed: () {
                         showBecomeCreatorDialog(context, _onConnectStripe);
                       },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        shape: StadiumBorder(),
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      ),
                       child: Text("profile_page.become_creator".tr().capitalize()),
                     )
                   ],
 
                 ] else ...[
                   ElevatedButton.icon(
-                    onPressed: () { if (_isAuthenticated) _toggleFollow; },
+                    onPressed: () { if (_isAuthenticated) _toggleFollow(); },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.secondary,
                       foregroundColor: Colors.white,
@@ -371,14 +455,17 @@ class _ProfilePageState extends State<ProfilePage> {
                   if (_user?['is_creator'] == true) ...[
                     SizedBox(width: 16),
                     ElevatedButton.icon(
-                      onPressed: () {}, // TODO: abonnement
+                      onPressed: () { if (_isAuthenticated) subscribeToCreator(); },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: Colors.white,
                         shape: StadiumBorder(),
                         padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                       ),
-                      label: Text("profile_page.subscribe".tr().capitalize()),
+                      label: Text(_isSubscriber == true
+                          ? "profile_page.subscribed".tr().capitalize()
+                          : "profile_page.subscribe".tr().capitalize()
+                      ),
                     ),
                   ]
                 ]
