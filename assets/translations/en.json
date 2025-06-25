@@ -14,40 +14,40 @@
     "error_occurred": "An error has occurred"
   },
   "user": {
-    "profile": "profile",
+    "profile": "Profile",
     "back_profile": "Back to profile",
     "not_found": "User not found",
     "field": {
-      "email": "email",
-      "password": "password",
-      "username": "username",
-      "firstname": "firstname",
-      "lastname": "lastname",
+      "email": "Email",
+      "password": "Password",
+      "username": "Username",
+      "firstname": "Firstname",
+      "lastname": "Lastname",
       "bio": "bio",
-      "profile_picture": "profile picture",
-      "subscription_price": "subscription price",
+      "profile_picture": "Profile picture",
+      "subscription_price": "Subscription price",
       "fields_required": "Email, password and username fields are required.",
       "profile_picture_invalid": "Invalid photo format. Allowed formats: JPG, PNG, WebP, HEIC."
     },
     "lang": {
-      "language": "language",
-      "french": "french",
-      "fr": "french",
-      "english": "english",
-      "en": "english",
+      "language": "Language",
+      "french": "French",
+      "fr": "French",
+      "english": "English",
+      "en": "English",
       "invalid": "Invalid language. Choose ‘fr’ or ‘en’."
     },
     "sign": {
-      "signup": "sign up",
-      "register": "register",
-      "registration": "registration",
+      "signup": "Sign up",
+      "register": "Register",
+      "registration": "Registration",
       "successful": "Successful registration",
       "error": "Registration error",
       "already_account": "Already have an account? Login"
     },
     "log": {
       "login": "login",
-      "connection": "connection",
+      "connection": "Connection",
       "logout": "log out",
       "logout_failed": "Logout failed",
       "successful": "Successful connection",
@@ -55,25 +55,25 @@
       "no_account": "Don't have an account yet? Sign in"
     },
     "edit": {
-      "register": "register",
-      "edit_profile": "Modify your profile",
+      "register": "Register",
+      "edit_profile": "Edit your profile",
       "no_update": "No changes detected",
       "updated_success": "Updated profile",
       "update_failed": "Update failed"
     },
     "theme": {
       "change_theme": "Change theme",
-      "light": "light mode",
-      "dark": "dark mode",
-      "system": "system mode"
+      "light": "Light mode",
+      "dark": "Dark mode",
+      "system": "System mode"
     },
     "search": {
-      "search": "search",
+      "search": "Search",
       "search_user": "Search for a user"
     }
   },
   "post": {
-    "create": "créer",
+    "create": "New post",
     "create_post": "Create New Post",
     "title": "Title",
     "title_required": "Title is required",

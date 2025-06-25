@@ -289,7 +289,7 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
       case SidebarItem.chats:
         return "chat.messages".tr().capitalize();
       case SidebarItem.profile:
-        return "user.profile".tr();
+        return "user.profile".tr().capitalize();
       case SidebarItem.login:
         return "user.log.login".tr().capitalize();
     }

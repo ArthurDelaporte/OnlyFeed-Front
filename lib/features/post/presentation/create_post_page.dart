@@ -168,6 +168,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   @override
   Widget build(BuildContext context) {
+    final locale = context.watch<LocaleNotifier>().locale;
     final session = context.watch<SessionNotifier>();
     final user = session.user;
     final isCreator = user?["is_creator"];
