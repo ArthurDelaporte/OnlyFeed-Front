@@ -197,12 +197,15 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> subscribeToCreator() async {
+  Future<void> _toggleSubscribeToCreator() async {
     final userId = _user?['id'];
 
+    if (_isSubscriber == true) {
+      showUnsubscribeDialog(context);
+      return;
+    }
     try {
       final response = await _dio.post('/api/stripe/create-subscription-session/$userId');
-
       final url = response.data['url'];
       if (url != null && await canLaunchUrl(Uri.parse(url))) {
         await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
@@ -210,7 +213,22 @@ class _ProfilePageState extends State<ProfilePage> {
         throw Exception("URL de session Stripe invalide");
       }
     } catch (e) {
-      print("Erreur lors de l’abonnement : $e");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("profile_page.subscription_error".tr())));
+    }
+  }
+
+  Future<void> _unsubscribeFromCreator() async {
+    final userId = _user?['id'];
+
+    try {
+      await _dio.delete('/api/stripe/unsubscribe/$userId');
+      setState(() {
+        _isSubscriber = false;
+        subscribersCount--;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("profile_page.unsubscribed".tr())));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("profile_page.subscription_error".tr())));
     }
   }
 
@@ -288,6 +306,53 @@ class _ProfilePageState extends State<ProfilePage> {
                 await onConfirm();
               },
               child: Text("profile_page.become_creator".tr()),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showUnsubscribeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "profile_page.unsubscribe_dialog.title".tr().capitalize(),
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () => Navigator.of(context).pop(),
+                tooltip: 'core.close'.tr().capitalize(),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("profile_page.unsubscribe_dialog.irrevocable".tr()),
+              SizedBox(height: 8),
+              Text("profile_page.unsubscribe_dialog.no_refund".tr()),
+              SizedBox(height: 8),
+              Text("profile_page.unsubscribe_dialog.repay".tr()),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _unsubscribeFromCreator();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary
+              ),
+              child: Text("profile_page.unsubscribe_now".tr().capitalize()),
             ),
           ],
         );
@@ -455,7 +520,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   if (_user?['is_creator'] == true) ...[
                     SizedBox(width: 16),
                     ElevatedButton.icon(
-                      onPressed: () { if (_isAuthenticated) subscribeToCreator(); },
+                      onPressed: () { if (_isAuthenticated) _toggleSubscribeToCreator(); },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: Colors.white,
@@ -537,64 +602,68 @@ class _ProfilePageState extends State<ProfilePage> {
     return ScaffoldWithMenubar(
       body: RefreshIndicator(
         onRefresh: () async => await _initProfile(),
-        child: Expanded(
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    _buildHeader(locale.languageCode),
-                    Text("post.my_posts".tr(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(24),
+                    child: Column(
                       children: [
+                        _buildHeader(locale.languageCode),
+                        Text("post.my_posts".tr(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 16),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              formatNumber(postsCount),
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Theme.of(context).colorScheme.secondary,
-                                fontWeight: FontWeight.bold
-                              )
+                            Row(
+                              children: [
+                                Text(
+                                    formatNumber(postsCount),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: Theme.of(context).colorScheme.secondary,
+                                        fontWeight: FontWeight.bold
+                                    )
+                                ),
+                                SizedBox(width: 4),
+                                Text("profile_page.posts".tr(), style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                              ],
                             ),
-                            SizedBox(width: 4),
-                            Text("profile_page.posts".tr(), style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                            if (_isCreator) ...[
+                              SizedBox(width: 16),
+                              Row(
+                                children: [
+                                  Text("core.including".tr(), style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                                  SizedBox(width: 4),
+                                  Text(
+                                      formatNumber(paidPostsCount),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: Theme.of(context).colorScheme.primary,
+                                          fontWeight: FontWeight.bold
+                                      )
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text("profile_page.premium".tr(), style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                                ],
+                              ),
+                            ]
                           ],
                         ),
-                        if (_isCreator) ...[
-                          SizedBox(width: 16),
-                          Row(
-                            children: [
-                              Text("core.including".tr(), style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                              SizedBox(width: 4),
-                              Text(
-                                formatNumber(paidPostsCount),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.bold
-                                )
-                              ),
-                              SizedBox(width: 4),
-                              Text("profile_page.premium".tr(), style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                            ],
-                          ),
-                        ]
+                        SizedBox(height: 16),
+                        PostGrid(posts: posts, isLoading: isLoadingPosts),
                       ],
                     ),
-                    SizedBox(height: 16),
-                    PostGrid(posts: posts, isLoading: isLoadingPosts),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          )
+              )
+            )
+          ],
         )
       ),
     );

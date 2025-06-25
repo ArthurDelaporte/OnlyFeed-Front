@@ -125,6 +125,13 @@
       "stripe_informations": "Stripe vous demandera des informations légales (SIRET, RIB/IBAN, etc.) pour vous verser vos gains.",
       "stripe_website": "Stripe vous demandera également un site web. Vous pouvez utiliser votre page profil OnlyFeed.",
       "not_becoming_creator": "Ne pas devenir créateur"
-    }
+    },
+    "unsubscribe_dialog": {
+      "title": "Se désabonner",
+      "irrevocable": "Cette action est irrévocable.",
+      "no_refund": "Aucun remboursement ne sera effectué.",
+      "repay": "Vous devrez repayer pour vous réabonner plus tard."
+    },
+    "unsubscribe_now": "Se désabonner maintenant"
   }
 }
