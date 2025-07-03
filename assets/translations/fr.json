@@ -5,6 +5,7 @@
   },
   "core": {
     "error": "erreur",
+    "retry": "Réessayer",
     "more": "plus",
     "less": "moins",
     "including": "dont",
@@ -110,7 +111,7 @@
     "subscribed": "abonné(e)",
     "subscribe": "s'abonner",
     "subscription_success": "Abonnement réussi !",
-    "subscription_error": "Échec de l’abonnement.",
+    "subscription_error": "Échec de l'abonnement.",
     "become_creator": "Devenir créateur",
     "become_creator_success": "Vous êtes désormais créateur !",
     "become_creator_error": "Une erreur est survenue pendant l'inscription à Stripe",
@@ -133,5 +134,28 @@
       "repay": "Vous devrez repayer pour vous réabonner plus tard."
     },
     "unsubscribe_now": "Se désabonner maintenant"
+  },
+  "message": {
+    "messages": "Messages",
+    "conversations": "Conversations",
+    "new_conversation": "Nouvelle conversation",
+    "new_conversation_coming_soon": "Nouvelle conversation - bientôt disponible",
+    "no_conversations": "Aucune conversation",
+    "start_conversation_hint": "Appuyez sur + pour démarrer une nouvelle conversation",
+    "no_messages": "Aucun message",
+    "send_first_message": "Envoyez votre premier message !",
+    "type_message": "Tapez votre message...",
+    "type_first_message": "Tapez votre premier message...",
+    "send_error": "Erreur lors de l'envoi",
+    "image": "Image",
+    "image_coming_soon": "Envoi d'images - bientôt disponible",
+    "now": "maintenant",
+    "new_conversation_with": "Nouvelle conversation avec",
+    "search_users": "Rechercher des utilisateurs",
+    "search_users_hint": "Rechercher par nom ou username...",
+    "no_users_found": "Aucun utilisateur trouvé",
+    "try_different_search": "Essayez une recherche différente",
+    "search_to_start": "Recherchez pour commencer",
+    "search_instructions": "Tapez au moins 2 caractères pour rechercher des utilisateurs"
   }
 }

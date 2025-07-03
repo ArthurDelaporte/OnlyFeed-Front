@@ -109,6 +109,7 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
         context.go('/$username/create');
         break;
       case SidebarItem.chats:
+      context.go('/app/messages');
         break;
       case SidebarItem.profile:
         context.go('/$username');

@@ -6,10 +6,12 @@ import 'package:onlyfeed_frontend/features/post/widgets/post_card.dart';
 class PostGrid extends StatelessWidget {
   final List<Post> posts;
   final bool isLoading;
+  final String username; // 🆕 Ajout du paramètre username
 
   const PostGrid({
     Key? key,
     required this.posts,
+    required this.username, // 🆕 Paramètre requis
     this.isLoading = false,
   }) : super(key: key);
 
@@ -46,7 +48,7 @@ class PostGrid extends StatelessWidget {
         itemCount: posts.length,
         itemBuilder: (context, index) {
           final post = posts[index];
-          return OnlyFeedPostCard(post: post);
+          return OnlyFeedPostCard(post: post, username: username); // ✅ Maintenant ça marche !
         },
       );
     }

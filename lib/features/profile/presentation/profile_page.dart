@@ -656,7 +656,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ],
                         ),
                         SizedBox(height: 16),
-                        PostGrid(posts: posts, isLoading: isLoadingPosts),
+                        PostGrid(posts: posts, isLoading: isLoadingPosts, username: widget.username),
                       ],
                     ),
                   ),

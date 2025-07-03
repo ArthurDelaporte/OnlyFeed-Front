@@ -5,6 +5,7 @@
   },
   "core": {
     "error": "error",
+    "retry": "Retry",
     "more": "more",
     "less": "less",
     "including": "including",
@@ -35,7 +36,7 @@
       "fr": "French",
       "english": "English",
       "en": "English",
-      "invalid": "Invalid language. Choose ‘fr’ or ‘en’."
+      "invalid": "Invalid language. Choose 'fr' or 'en'."
     },
     "sign": {
       "signup": "Sign up",
@@ -133,5 +134,28 @@
       "repay": "You will have to pay again to re-subscribe at a later date."
     },
     "unsubscribe_now": "Unsubscribe now"
+  },
+  "message": {
+    "messages": "Messages",
+    "conversations": "Conversations", 
+    "new_conversation": "New conversation",
+    "new_conversation_coming_soon": "New conversation - coming soon",
+    "no_conversations": "No conversations",
+    "start_conversation_hint": "Tap + to start a new conversation",
+    "no_messages": "No messages",
+    "send_first_message": "Send your first message!",
+    "type_message": "Type your message...",
+    "type_first_message": "Type your first message...",
+    "send_error": "Error sending message",
+    "image": "Image",
+    "image_coming_soon": "Image sending - coming soon",
+    "now": "now",
+    "new_conversation_with": "New conversation with",
+    "search_users": "Search users",
+    "search_users_hint": "Search by name or username...",
+    "no_users_found": "No users found",
+    "try_different_search": "Try a different search",
+    "search_to_start": "Search to start",
+    "search_instructions": "Type at least 2 characters to search for users"
   }
 }

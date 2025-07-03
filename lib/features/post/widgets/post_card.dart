@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:onlyfeed_frontend/features/post/model/post_model.dart';
-import 'package:onlyfeed_frontend/features/post/widgets/post_detail_view.dart';
 
 class OnlyFeedPostCard extends StatelessWidget {
   final Post post;
+  final String username; // Ajout du username
 
   const OnlyFeedPostCard({
     Key? key,
     required this.post,
+    required this.username,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Ouvrir le modal de détail du post
-        _showPostDetail(context, post);
+        // 🆕 Navigation vers la nouvelle page au lieu du modal
+        context.go('/$username/post/${post.id}');
       },
       child: Stack(
         fit: StackFit.expand,
@@ -68,26 +70,6 @@ class OnlyFeedPostCard extends StatelessWidget {
             ),
         ],
       ),
-    );
-  }
-
-  // Méthode pour afficher le détail du post dans un modal
-  void _showPostDetail(BuildContext context, Post post) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Container(
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: PostDetailView(post: post),
-          ),
-        );
-      },
     );
   }
 }
