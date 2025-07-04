@@ -13,6 +13,7 @@ enum SidebarItem {
   chats,
   profile,
   login,
+  adminDashboard,
 }
 
 const sizeMinSidebar = 768;
@@ -117,6 +118,9 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
       case SidebarItem.login:
         context.go('/account/login');
         break;
+      case SidebarItem.adminDashboard:
+        context.go('/admin/dashboard');
+        break;
     }
   }
 
@@ -129,7 +133,10 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
     final languageCode = locale.languageCode;
     final user = session.user;
     final username = user?['username'];
+    final isAdmin = user?['is_admin'];
     final isMobile = width < sizeMinSidebar;
+
+    print(user);
 
     final items = <SidebarItem>[
       SidebarItem.home,
@@ -137,7 +144,8 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
       if (session.isAuthenticated) ...[
         SidebarItem.create,
         SidebarItem.chats,
-        SidebarItem.profile
+        SidebarItem.profile,
+        if (isAdmin != null && isAdmin != false) SidebarItem.adminDashboard,
       ]
       else SidebarItem.login,
     ];
@@ -276,6 +284,8 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
         return const Icon(Icons.person_rounded);
       case SidebarItem.login:
         return const Icon(Icons.login_rounded);
+      case SidebarItem.adminDashboard:
+        return const Icon(Icons.admin_panel_settings_rounded);
     }
   }
 
@@ -293,6 +303,8 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
         return "user.profile".tr().capitalize();
       case SidebarItem.login:
         return "user.log.login".tr().capitalize();
+      case SidebarItem.adminDashboard: // 👈 Ajout
+        return "admin.dashboard_title".tr();
     }
   }
 

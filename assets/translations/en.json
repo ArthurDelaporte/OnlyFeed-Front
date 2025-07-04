@@ -6,6 +6,7 @@
   "core": {
     "error": "error",
     "retry": "Retry",
+    "see_more": "See more",
     "more": "more",
     "less": "less",
     "including": "including",
@@ -137,7 +138,7 @@
   },
   "message": {
     "messages": "Messages",
-    "conversations": "Conversations", 
+    "conversations": "Conversations",
     "new_conversation": "New conversation",
     "new_conversation_coming_soon": "New conversation - coming soon",
     "no_conversations": "No conversations",
@@ -157,5 +158,11 @@
     "try_different_search": "Try a different search",
     "search_to_start": "Search to start",
     "search_instructions": "Type at least 2 characters to search for users"
+  },
+  "admin": {
+    "dashboard_title": "Admin Dashboard",
+    "stats": "Statistics",
+    "recent_reports": "Recent reports",
+    "users_list": "Users list"
   }
 }

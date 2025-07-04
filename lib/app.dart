@@ -8,6 +8,7 @@ import 'package:onlyfeed_frontend/features/profile/presentation/profile_page.dar
 import 'package:onlyfeed_frontend/features/profile/presentation/edit_profile_page.dart';
 import 'package:onlyfeed_frontend/features/post/presentation/create_post_page.dart';
 import 'package:onlyfeed_frontend/features/post/presentation/post_detail_page.dart';
+import 'package:onlyfeed_frontend/features/admin/presentation/admin_dashboard_page.dart';
 import 'package:onlyfeed_frontend/shared/notifiers/session_notifier.dart';
 
 // Imports pour la messagerie
@@ -22,7 +23,7 @@ class OnlyFeedApp {
     initialLocation: '/',
     routes: [
       GoRoute(path: '/', builder: (context, state) => HomePage()),
-      
+
       // Routes d'authentification
       GoRoute(
         path: '/account/login',
@@ -35,7 +36,7 @@ class OnlyFeedApp {
         }
       ),
       GoRoute(path: '/account/signup', builder: (context, state) => SignupPage()),
-      
+
       // Routes de messagerie (avec préfixe /app/ pour éviter les conflits)
       GoRoute(
         path: '/app/messages',
@@ -55,18 +56,18 @@ class OnlyFeedApp {
           return ChatPageWithUsername(username: username);
         },
       ),
-      
+
       // Routes legacy pour compatibilité (optionnel - à supprimer plus tard si non utilisées)
       GoRoute(
         path: '/app/messages/chat/id/:conversationId',
         builder: (context, state) {
           final conversationId = state.pathParameters['conversationId']!;
           final extra = state.extra as Map<String, dynamic>?;
-          
+
           if (extra == null || extra['otherUser'] == null) {
             return ConversationsPage();
           }
-          
+
           return ChatPage(
             conversationId: conversationId,
             otherUser: extra['otherUser'] as ConversationUser,
@@ -83,7 +84,7 @@ class OnlyFeedApp {
           );
         },
       ),
-      
+
       // Routes de profil (structure GitHub maintenue)
       GoRoute(
         path: '/:username',
@@ -130,6 +131,15 @@ class OnlyFeedApp {
           ),
         ]
       ),
+      GoRoute(
+        path: '/admin/dashboard',
+        builder: (context, state) => AdminDashboardPage(),
+        redirect: (context, state){
+          final isAdmin = context.read<SessionNotifier>().user?['is_admin'];
+          if (isAdmin == null || isAdmin == false) return '/account/login';
+          return null;
+        },
+      )
     ],
   );
 }

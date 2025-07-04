@@ -6,6 +6,7 @@
   "core": {
     "error": "erreur",
     "retry": "Réessayer",
+    "see_more": "Voir plus",
     "more": "plus",
     "less": "moins",
     "including": "dont",
@@ -157,5 +158,11 @@
     "try_different_search": "Essayez une recherche différente",
     "search_to_start": "Recherchez pour commencer",
     "search_instructions": "Tapez au moins 2 caractères pour rechercher des utilisateurs"
+  },
+  "admin": {
+    "dashboard_title": "Dashboard Administrateur",
+    "stats": "Statistiques",
+    "recent_reports": "Signalements récents",
+    "users_list": "Liste des utilisateurs"
   }
 }
