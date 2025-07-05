@@ -13,7 +13,9 @@
     "open": "ouvrir",
     "close": "fermer",
     "missing_parameter": "Paramètre manquant",
-    "error_occurred": "Une erreur est survenue"
+    "error_occurred": "Une erreur est survenue",
+    "not_found": "La page demandée est introuvable.",
+    "go_home": "Revenir à l'accueil"
   },
   "user": {
     "profile": "profil",

@@ -9,6 +9,7 @@ import 'package:onlyfeed_frontend/features/profile/presentation/edit_profile_pag
 import 'package:onlyfeed_frontend/features/post/presentation/create_post_page.dart';
 import 'package:onlyfeed_frontend/features/post/presentation/post_detail_page.dart';
 import 'package:onlyfeed_frontend/features/admin/presentation/admin_dashboard_page.dart';
+import 'package:onlyfeed_frontend/core/pages/not_found_page.dart';
 import 'package:onlyfeed_frontend/shared/notifiers/session_notifier.dart';
 
 // Imports pour la messagerie
@@ -133,13 +134,13 @@ class OnlyFeedApp {
       ),
       GoRoute(
         path: '/admin/dashboard',
-        builder: (context, state) => AdminDashboardPage(),
-        redirect: (context, state){
+        builder: (context, state) {
           final isAdmin = context.read<SessionNotifier>().user?['is_admin'];
-          if (isAdmin == null || isAdmin == false) return '/account/login';
-          return null;
+          if (isAdmin == null || isAdmin == false) return NotFoundPage();
+          return AdminDashboardPage();
         },
       )
     ],
+    errorBuilder: (context, state) => NotFoundPage(),
   );
 }

@@ -50,10 +50,12 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
         ? ThemeMode.system
         : ThemeMode.light;
     themeNotifier.setTheme(next);
-    await _dio.put(
-      '/api/me',
-      data: FormData.fromMap({'theme': next.name}),
-    );
+    if (context.read<SessionNotifier>().isAuthenticated) {
+      await _dio.put(
+        '/api/me',
+        data: FormData.fromMap({'theme': next.name}),
+      );
+    }
   }
 
   Future<void> _toggleLocale() async {
@@ -62,10 +64,12 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
     locale.locale.languageCode == 'fr' ? Locale('en') : Locale('fr');
     await context.setLocale(newLocale);
     locale.setLocale(newLocale);
-    await _dio.put(
-      '/api/me',
-      data: FormData.fromMap({'language': newLocale.languageCode}),
-    );
+    if (context.read<SessionNotifier>().isAuthenticated) {
+      await _dio.put(
+        '/api/me',
+        data: FormData.fromMap({'language': newLocale.languageCode}),
+      );
+    }
   }
 
   Future<void> _logout() async {
@@ -135,8 +139,6 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
     final username = user?['username'];
     final isAdmin = user?['is_admin'];
     final isMobile = width < sizeMinSidebar;
-
-    print(user);
 
     final items = <SidebarItem>[
       SidebarItem.home,

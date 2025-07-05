@@ -13,7 +13,9 @@
     "open": "open",
     "close": "close",
     "missing_parameter": "Missing parameter",
-    "error_occurred": "An error has occurred"
+    "error_occurred": "An error has occurred",
+    "not_found": "The requested page could not be found.",
+    "go_home": "Go to homepage"
   },
   "user": {
     "profile": "Profile",
