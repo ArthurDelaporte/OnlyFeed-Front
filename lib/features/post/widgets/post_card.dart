@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:onlyfeed_frontend/features/post/model/post_model.dart';
+import 'package:onlyfeed_frontend/features/message/presentation/share_post_dialog.dart';
 
 class OnlyFeedPostCard extends StatelessWidget {
   final Post post;
-  final String username; // Ajout du username
+  final String username;
 
   const OnlyFeedPostCard({
     Key? key,
@@ -12,11 +13,21 @@ class OnlyFeedPostCard extends StatelessWidget {
     required this.username,
   }) : super(key: key);
 
+  void _sharePost(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => SharePostDialog(
+        post: post,
+        username: username,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // 🆕 Navigation vers la nouvelle page au lieu du modal
+        // Navigation vers la page de détail du post
         context.go('/$username/post/${post.id}');
       },
       child: Stack(
@@ -68,6 +79,32 @@ class OnlyFeedPostCard extends StatelessWidget {
                 ),
               ),
             ),
+
+          // 🆕 Bouton de partage
+          Positioned(
+            top: 4,
+            left: 4,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: IconButton(
+                icon: Icon(
+                  Icons.share,
+                  color: Colors.white,
+                  size: 16,
+                ),
+                onPressed: () => _sharePost(context),
+                splashRadius: 16,
+                padding: EdgeInsets.all(4),
+                constraints: BoxConstraints(
+                  minWidth: 32,
+                  minHeight: 32,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

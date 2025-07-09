@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:onlyfeed_frontend/core/widgets/scaffold_with_menubar.dart';
 import 'package:onlyfeed_frontend/features/post/model/post_model.dart';
 import 'package:onlyfeed_frontend/features/like/like.dart';
+import 'package:onlyfeed_frontend/features/message/presentation/share_post_dialog.dart';
 import 'package:onlyfeed_frontend/shared/services/dio_client.dart';
 
 class PostDetailPage extends StatefulWidget {
@@ -169,6 +170,19 @@ class _PostDetailPageState extends State<PostDetailPage> {
     });
   }
 
+  // 🆕 Fonction pour ouvrir le dialogue de partage
+  void _sharePost() {
+    if (post != null) {
+      showDialog(
+        context: context,
+        builder: (context) => SharePostDialog(
+          post: post!,
+          username: widget.username,
+        ),
+      );
+    }
+  }
+
   String _formatTimestamp(DateTime timestamp) {
     final now = DateTime.now();
     final difference = now.difference(timestamp);
@@ -329,7 +343,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       SizedBox(height: 8),
                     ],
                     
-                    // ✅ Row avec date et bouton like
+                    // ✅ Row avec date, bouton like ET bouton partage
                     Row(
                       children: [
                         Text(
@@ -347,6 +361,43 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           initialIsLiked: _isLiked,
                           onLikeChanged: _onLikeChanged,
                           style: LikeButtonStyle.standard,
+                        ),
+                        SizedBox(width: 8),
+                        // 🆕 Bouton Partage (desktop)
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                          child: InkWell(
+                            onTap: _sharePost,
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.share,
+                                    color: Colors.grey[600],
+                                    size: 16,
+                                  ),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    "Partager",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -467,24 +518,70 @@ class _PostDetailPageState extends State<PostDetailPage> {
                               SizedBox(height: 8),
                             ],
                             
-                            // ✅ Row avec date et bouton like (mobile)
-                            Row(
+                            // ✅ Row avec date, bouton like ET bouton partage (mobile)
+                            Column(
                               children: [
-                                Text(
-                                  DateFormat('dd/MM/yyyy HH:mm').format(post!.createdAt),
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 12,
-                                  ),
+                                // Première ligne : Date
+                                Row(
+                                  children: [
+                                    Text(
+                                      DateFormat('dd/MM/yyyy HH:mm').format(post!.createdAt),
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(width: 12),
-                                // ✅ Bouton Like (mobile compact)
-                                LikeButton(
-                                  postId: post!.id,
-                                  initialLikeCount: _likeCount,
-                                  initialIsLiked: _isLiked,
-                                  onLikeChanged: _onLikeChanged,
-                                  style: LikeButtonStyle.compact,
+                                SizedBox(height: 8),
+                                // Deuxième ligne : Boutons Like et Partage
+                                Row(
+                                  children: [
+                                    // ✅ Bouton Like (mobile compact)
+                                    LikeButton(
+                                      postId: post!.id,
+                                      initialLikeCount: _likeCount,
+                                      initialIsLiked: _isLiked,
+                                      onLikeChanged: _onLikeChanged,
+                                      style: LikeButtonStyle.compact,
+                                    ),
+                                    SizedBox(width: 12),
+                                    // 🆕 Bouton Partage (mobile compact)
+                                    InkWell(
+                                      onTap: _sharePost,
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(16),
+                                          border: Border.all(
+                                            color: Colors.grey[300]!,
+                                            width: 1,
+                                          ),
+                                          color: Colors.transparent,
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.share,
+                                              color: Colors.grey[600],
+                                              size: 16,
+                                            ),
+                                            SizedBox(width: 6),
+                                            Text(
+                                              "Partager",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey[600],
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

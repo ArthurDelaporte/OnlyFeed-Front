@@ -2,9 +2,153 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:onlyfeed_frontend/features/message/model/message_model.dart';
 import 'package:onlyfeed_frontend/features/message/services/message_service.dart';
 import 'package:onlyfeed_frontend/shared/services/dio_client.dart';
+
+// Classe utilitaire pour détecter et extraire les liens de posts
+class PostLinkDetector {
+  static RegExp _postLinkRegex = RegExp(
+    r'(?:https?://)?(?:www\.)?[^/]+/([^/]+)/post/([a-zA-Z0-9-]+)',
+    caseSensitive: false,
+  );
+
+  static Map<String, String>? extractPostLink(String content) {
+    final match = _postLinkRegex.firstMatch(content);
+    if (match != null) {
+      return {
+        'username': match.group(1)!,
+        'postId': match.group(2)!,
+        'fullUrl': match.group(0)!,
+      };
+    }
+    return null;
+  }
+
+  static String getContentWithoutLink(String content) {
+    return content.replaceAll(_postLinkRegex, '').trim();
+  }
+}
+
+// Widget pour afficher un aperçu du post partagé
+class SharedPostPreview extends StatelessWidget {
+  final String username;
+  final String postId;
+  final String fullUrl;
+  final bool isFromMe;
+
+  const SharedPostPreview({
+    Key? key,
+    required this.username,
+    required this.postId,
+    required this.fullUrl,
+    required this.isFromMe,
+  }) : super(key: key);
+
+  void _openPost(BuildContext context) {
+    // Navigation vers le post
+    context.go('/$username/post/$postId');
+  }
+
+  void _openExternalLink() async {
+    final uri = Uri.parse(fullUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: 8),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: isFromMe ? Colors.white.withOpacity(0.3) : Colors.grey[300]!,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        color: isFromMe 
+          ? Colors.white.withOpacity(0.1)
+          : Colors.grey[50],
+      ),
+      child: InkWell(
+        onTap: () => _openPost(context),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // Icône de post
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: isFromMe 
+                    ? Colors.white.withOpacity(0.2)
+                    : Theme.of(context).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.photo_camera,
+                  color: isFromMe 
+                    ? Colors.white
+                    : Theme.of(context).primaryColor,
+                  size: 20,
+                ),
+              ),
+              SizedBox(width: 12),
+              
+              // Informations du post
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.photo_album,
+                          size: 14,
+                          color: isFromMe ? Colors.white70 : Colors.grey[600],
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          'Post partagé',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isFromMe ? Colors.white70 : Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      '@$username',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: isFromMe 
+                          ? Colors.white
+                          : Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Bouton d'ouverture
+              Icon(
+                Icons.open_in_new,
+                size: 16,
+                color: isFromMe ? Colors.white70 : Colors.grey[600],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class ChatPage extends StatefulWidget {
   final String? conversationId;
@@ -200,6 +344,7 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  // 🆕 VERSION AMÉLIORÉE: Support du partage de posts
   Widget _buildMessageBubble(Message message) {
     // 🔧 DÉTECTION ROBUSTE: plusieurs critères pour identifier nos messages
     final isMe = message.sender.id == _currentUserId || 
@@ -208,80 +353,109 @@ class _ChatPageState extends State<ChatPage> {
                  
     final isTemporary = message.id.startsWith('temp_');
     
+    // 🆕 Détecter si le message contient un lien de post
+    final postLinkData = PostLinkDetector.extractPostLink(message.content);
+    final contentWithoutLink = postLinkData != null 
+      ? PostLinkDetector.getContentWithoutLink(message.content)
+      : message.content;
+    
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Opacity(
         opacity: isTemporary ? 0.7 : 1.0,
         child: Container(
           margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           decoration: BoxDecoration(
             color: isMe 
               ? Theme.of(context).primaryColor 
               : Colors.grey[300],
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.7,
+            maxWidth: MediaQuery.of(context).size.width * 0.75,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Type de média (image, vidéo, etc.)
               if (message.messageType == MessageType.image && message.mediaUrl != null)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    message.mediaUrl!,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        height: 200,
-                        child: Center(child: CircularProgressIndicator()),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 200,
-                        child: Icon(Icons.error),
-                      );
-                    },
+                Container(
+                  margin: EdgeInsets.only(bottom: 8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      message.mediaUrl!,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          height: 200,
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 200,
+                          child: Icon(Icons.error),
+                        );
+                      },
+                    ),
                   ),
                 ),
-              if (message.content.isNotEmpty)
-                Text(
-                  message.content,
-                  style: TextStyle(
-                    color: isMe ? Colors.white : Colors.black87,
+              
+              // 🆕 Contenu textuel (sans le lien s'il y en a un)
+              if (contentWithoutLink.isNotEmpty)
+                Padding(
+                  padding: EdgeInsets.only(
+                    bottom: postLinkData != null ? 0 : 8
+                  ),
+                  child: Text(
+                    contentWithoutLink,
+                    style: TextStyle(
+                      color: isMe ? Colors.white : Colors.black87,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
-              SizedBox(height: 4),
+              
+              // 🆕 Aperçu du post partagé
+              if (postLinkData != null)
+                SharedPostPreview(
+                  username: postLinkData['username']!,
+                  postId: postLinkData['postId']!,
+                  fullUrl: postLinkData['fullUrl']!,
+                  isFromMe: isMe,
+                ),
+              
+              // Informations de timestamp et statut
+              SizedBox(height: 8),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     DateFormat('HH:mm').format(message.createdAt),
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       color: isMe ? Colors.white70 : Colors.grey[600],
                     ),
                   ),
                   if (isMe) ...[
-                    SizedBox(width: 4),
+                    SizedBox(width: 6),
                     if (isTemporary)
                       SizedBox(
-                        width: 16,
-                        height: 16,
+                        width: 14,
+                        height: 14,
                         child: CircularProgressIndicator(
-                          strokeWidth: 2,
+                          strokeWidth: 1.5,
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white70),
                         ),
                       )
                     else
                       Icon(
                         message.isRead ? Icons.done_all : Icons.done,
-                        size: 16,
-                        color: message.isRead ? Colors.blue : Colors.white70,
+                        size: 14,
+                        color: message.isRead ? Colors.blue[300] : Colors.white70,
                       ),
                   ],
                 ],
