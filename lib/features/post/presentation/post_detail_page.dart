@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:onlyfeed_frontend/core/widgets/scaffold_with_menubar.dart';
 import 'package:onlyfeed_frontend/features/post/model/post_model.dart';
+import 'package:onlyfeed_frontend/features/like/like.dart';
 import 'package:onlyfeed_frontend/shared/services/dio_client.dart';
 
 class PostDetailPage extends StatefulWidget {
@@ -28,6 +29,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
   bool isLoadingPost = true;
   bool isLoadingComments = true;
   bool isSendingComment = false;
+  
+  // Variables pour gérer les likes
+  int _likeCount = 0;
+  bool _isLiked = false;
 
   @override
   void initState() {
@@ -52,14 +57,21 @@ class _PostDetailPageState extends State<PostDetailPage> {
         
         setState(() {
           post = Post(
-            id: postData['ID'],                                    // ✅ Majuscule
-            title: postData['Title'],                              // ✅ Majuscule
-            description: postData['Description'] ?? '',           // ✅ Majuscule
-            mediaURL: postData['MediaURL'] ?? '',                // ✅ CamelCase
-            isPaid: postData['IsPaid'] ?? false,                 // ✅ CamelCase
-            createdAt: DateTime.parse(postData['CreatedAt']),     // ✅ CamelCase
-            userId: postData['UserID'],                           // ✅ CamelCase
+            id: postData['ID'],
+            title: postData['Title'],
+            description: postData['Description'] ?? '',
+            mediaURL: postData['MediaURL'] ?? '',
+            isPaid: postData['IsPaid'] ?? false,
+            createdAt: DateTime.parse(postData['CreatedAt']),
+            userId: postData['UserID'],
+            likeCount: postData['like_count'] ?? 0,
+            isLiked: postData['is_liked'] ?? false,
           );
+          
+          // Initialiser les variables de like
+          _likeCount = post!.likeCount;
+          _isLiked = post!.isLiked;
+          
           isLoadingPost = false;
         });
         
@@ -149,6 +161,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
   }
 
+  // Callback pour gérer les changements de like
+  void _onLikeChanged(LikeResponse likeResponse) {
+    setState(() {
+      _likeCount = likeResponse.likeCount;
+      _isLiked = likeResponse.isLiked;
+    });
+  }
+
   String _formatTimestamp(DateTime timestamp) {
     final now = DateTime.now();
     final difference = now.difference(timestamp);
@@ -201,7 +221,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
 
     // 🔧 Détection mobile/desktop basée sur ScaffoldWithMenubar
-    final isMobile = MediaQuery.of(context).size.width < 768; // sizeMinSidebar
+    final isMobile = MediaQuery.of(context).size.width < 768;
 
     if (isMobile) {
       // 📱 Version mobile avec zone de saisie fixée en bas
@@ -308,13 +328,29 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       ),
                       SizedBox(height: 8),
                     ],
-                    Text(
-                      DateFormat('dd/MM/yyyy HH:mm').format(post!.createdAt),
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
+                    
+                    // ✅ Row avec date et bouton like
+                    Row(
+                      children: [
+                        Text(
+                          DateFormat('dd/MM/yyyy HH:mm').format(post!.createdAt),
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        // ✅ Bouton Like (desktop)
+                        LikeButton(
+                          postId: post!.id,
+                          initialLikeCount: _likeCount,
+                          initialIsLiked: _isLiked,
+                          onLikeChanged: _onLikeChanged,
+                          style: LikeButtonStyle.standard,
+                        ),
+                      ],
                     ),
+                    
                     if (post!.isPaid) ...[
                       SizedBox(height: 8),
                       Chip(
@@ -430,13 +466,29 @@ class _PostDetailPageState extends State<PostDetailPage> {
                               ),
                               SizedBox(height: 8),
                             ],
-                            Text(
-                              DateFormat('dd/MM/yyyy HH:mm').format(post!.createdAt),
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
-                              ),
+                            
+                            // ✅ Row avec date et bouton like (mobile)
+                            Row(
+                              children: [
+                                Text(
+                                  DateFormat('dd/MM/yyyy HH:mm').format(post!.createdAt),
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                // ✅ Bouton Like (mobile compact)
+                                LikeButton(
+                                  postId: post!.id,
+                                  initialLikeCount: _likeCount,
+                                  initialIsLiked: _isLiked,
+                                  onLikeChanged: _onLikeChanged,
+                                  style: LikeButtonStyle.compact,
+                                ),
+                              ],
                             ),
+                            
                             if (post!.isPaid) ...[
                               SizedBox(height: 8),
                               Chip(
@@ -574,7 +626,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       // Zone de saisie fixée en bas
       bottomNavigationBar: Container(
         padding: EdgeInsets.fromLTRB(16, 8, 16, 
-          MediaQuery.of(context).padding.bottom + 8), // Respect du safe area
+          MediaQuery.of(context).padding.bottom + 8),
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
           border: Border(
@@ -617,9 +669,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     : Colors.white,
                 ),
                 maxLines: null,
-                maxLength: 500, // Limite de caractères
+                maxLength: 500,
                 buildCounter: (context, {required currentLength, maxLength, required isFocused}) {
-                  return null; // Cache le compteur
+                  return null;
                 },
               ),
             ),
@@ -652,7 +704,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   // 💬 Section commentaires (utilisée pour desktop uniquement maintenant)
   Widget _buildCommentsSection() {
     return Container(
-      height: MediaQuery.of(context).size.height - 100, // Desktop : hauteur fixe
+      height: MediaQuery.of(context).size.height - 100,
       padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
         border: Border(
