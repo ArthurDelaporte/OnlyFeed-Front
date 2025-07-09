@@ -40,4 +40,3 @@ flutter:
     - assets/translations/
     - assets/img/flags/fr.jpg
     - assets/img/flags/en.jpg
-    - .env
