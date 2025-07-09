@@ -12,6 +12,8 @@
     "including": "including",
     "open": "open",
     "close": "close",
+    "cancel": "Cancel",
+    "delete": "Delete",
     "missing_parameter": "Missing parameter",
     "error_occurred": "An error has occurred",
     "not_found": "The requested page could not be found.",
@@ -21,17 +23,19 @@
     "profile": "Profile",
     "back_profile": "Back to profile",
     "not_found": "User not found",
+    "creator": "Creator",
     "field": {
       "email": "Email",
       "password": "Password",
       "username": "Username",
-      "firstname": "Firstname",
-      "lastname": "Lastname",
-      "bio": "bio",
+      "firstname": "First name",
+      "lastname": "Last name",
+      "bio": "Bio",
       "profile_picture": "Profile picture",
       "subscription_price": "Subscription price",
       "fields_required": "Email, password and username fields are required.",
-      "profile_picture_invalid": "Invalid photo format. Allowed formats: JPG, PNG, WebP, HEIC."
+      "profile_picture_invalid": "Invalid photo format. Allowed formats: JPG, PNG, WebP, HEIC.",
+      "invalid": "Missing required fields"
     },
     "lang": {
       "language": "Language",
@@ -43,26 +47,26 @@
     },
     "sign": {
       "signup": "Sign up",
-      "register": "Register",
+      "register": "Create my account",
       "registration": "Registration",
       "successful": "Successful registration",
       "error": "Registration error",
-      "already_account": "Already have an account? Login"
+      "already_account": "Already have an account? Sign in"
     },
     "log": {
-      "login": "login",
+      "login": "sign in",
       "connection": "Connection",
-      "logout": "log out",
+      "logout": "sign out",
       "logout_failed": "Logout failed",
       "successful": "Successful connection",
       "error": "Connection error",
-      "no_account": "Don't have an account yet? Sign in"
+      "no_account": "Don't have an account yet? Sign up"
     },
     "edit": {
-      "register": "Register",
+      "register": "Save",
       "edit_profile": "Edit your profile",
       "no_update": "No changes detected",
-      "updated_success": "Updated profile",
+      "updated_success": "Profile updated",
       "update_failed": "Update failed"
     },
     "theme": {
@@ -77,7 +81,7 @@
     }
   },
   "post": {
-    "create": "New post",
+    "create": "create",
     "create_post": "Create New Post",
     "title": "Title",
     "title_required": "Title is required",
@@ -92,7 +96,19 @@
     "media_required": "A photo is required",
     "image_pick_error": "Error selecting image",
     "my_posts": "My posts",
-    "no_posts_yet": "You haven't posted any content yet"
+    "no_posts_yet": "You haven't posted any content yet",
+    "not_found": "Post not found",
+    "share": "Share",
+    "comments": "Comments",
+    "no_comments": "No comments",
+    "add_comment": "Add a comment...",
+    "comment_send_error": "Error sending comment",
+    "just_now": "Just now",
+    "premium_content": "Premium content"
+  },
+  "like": {
+    "login_required": "You must be signed in to like a post",
+    "login_button": "Sign in"
   },
   "chat": {
     "message": "message",
@@ -101,11 +117,11 @@
   "profile_page": {
     "followers": "followers",
     "subscribers": "subscribers",
-    "followups": "followups",
+    "followups": "following",
     "subscriptions": "subscriptions",
     "subscription_price": "Subscription price:",
     "subscription_price_paid": "Subscription price paid:",
-    "by_month": "by month",
+    "by_month": "per month",
     "posts": "posts",
     "premium_posts": "premium posts",
     "premium": "premium",
@@ -113,28 +129,29 @@
     "follow": "follow",
     "subscribed": "subscribed",
     "subscribe": "subscribe",
-    "subscription_success": "Successful subscription !",
+    "unsubscribed": "Successfully unsubscribed",
+    "subscription_success": "Successful subscription!",
     "subscription_error": "Subscription failed.",
     "become_creator": "Become creator",
     "become_creator_success": "You are now a creator!",
-    "become_creator_error": "An error occurred when registering with Stripe",
+    "become_creator_error": "An error occurred during Stripe registration",
     "become_creator_dialog": {
       "why": "Why become a creator?",
       "exclusive_content": "By becoming a creator, you can publish exclusive content accessible only to paying subscribers.",
       "monthly": "Users can subscribe to your paid content on a monthly basis.",
       "sub_price": "By default, the subscription is €5, but the amount can be modified at any time.",
       "commission": "OnlyFeed takes a commission for each subscription.",
-      "next_steps": "Here are the next steps in becoming a creator:",
+      "next_steps": "Here are the next steps to become a creator:",
       "stripe_redirected": "You will be redirected to Stripe to create an account.",
-      "stripe_informations": "Stripe will ask you for legal information (SIRET, RIB/IBAN, etc.) to pay you your winnings.",
+      "stripe_informations": "Stripe will ask you for legal information (business number, bank details, etc.) to pay you your earnings.",
       "stripe_website": "Stripe will also ask you for a website. You can use your OnlyFeed profile page.",
       "not_becoming_creator": "Not becoming a creator"
     },
     "unsubscribe_dialog": {
       "title": "Unsubscribe",
-      "irrevocable": "This action is irrevocable.",
+      "irrevocable": "This action is irreversible.",
       "no_refund": "No refunds will be made.",
-      "repay": "You will have to pay again to re-subscribe at a later date."
+      "repay": "You will have to pay again to re-subscribe later."
     },
     "unsubscribe_now": "Unsubscribe now"
   },
@@ -159,7 +176,13 @@
     "no_users_found": "No users found",
     "try_different_search": "Try a different search",
     "search_to_start": "Search to start",
-    "search_instructions": "Type at least 2 characters to search for users"
+    "search_instructions": "Type at least 2 characters to search for users",
+    "conversation_deleted": "Conversation deleted",
+    "delete_error": "Error deleting",
+    "delete_conversation": "Delete conversation",
+    "delete_conversation_warning": "Do you really want to delete your conversation with {username}?",
+    "important": "Important",
+    "delete_explanation": "This action will delete the conversation only from your side. The other user will still be able to see the conversation and send you new messages."
   },
   "admin": {
     "dashboard_title": "Admin Dashboard",

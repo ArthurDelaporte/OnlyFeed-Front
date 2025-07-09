@@ -24,6 +24,7 @@ class LikeService {
   }
 
   /// Récupérer le statut des likes pour un post
+  /// 🔧 MODIFICATION : Gérer le cas non authentifié
   Future<LikeResponse> getLikeStatus(String postId) async {
     try {
       final response = await _dio.get('/api/posts/$postId/likes');
@@ -31,6 +32,13 @@ class LikeService {
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
         throw Exception('Post non trouvé');
+      } else if (e.response?.statusCode == 401) {
+        // ✅ Si non authentifié, retourner un statut par défaut
+        return LikeResponse(
+          postId: postId,
+          likeCount: 0, // Ou récupérer depuis une autre source si disponible
+          isLiked: false,
+        );
       }
       throw Exception('Erreur lors de la récupération du statut des likes: ${e.message}');
     } catch (e) {
@@ -39,6 +47,7 @@ class LikeService {
   }
 
   /// Récupérer les posts avec les informations de likes
+  /// 🔧 MODIFICATION : Gérer correctement l'état d'authentification
   Future<List<Map<String, dynamic>>> getPostsWithLikes({bool showPaywalled = false}) async {
     try {
       final response = await _dio.get('/api/posts', queryParameters: {
@@ -46,12 +55,37 @@ class LikeService {
       });
       
       final List<dynamic> postsData = response.data['posts'] ?? [];
-      return postsData.cast<Map<String, dynamic>>();
+      
+      // 🔧 NOUVELLE LOGIQUE : Nettoyer les données de likes si non authentifié
+      return postsData.map<Map<String, dynamic>>((post) {
+        final Map<String, dynamic> postMap = Map<String, dynamic>.from(post);
+        
+        // Si l'utilisateur n'est pas authentifié (vérifiable via l'absence de certains champs),
+        // forcer is_liked à false
+        if (!_isUserAuthenticated(response)) {
+          postMap['is_liked'] = false;
+        }
+        
+        return postMap;
+      }).toList();
     } on DioException catch (e) {
       throw Exception('Erreur lors de la récupération des posts avec likes: ${e.message}');
     } catch (e) {
       throw Exception('Erreur lors de la récupération des posts avec likes: $e');
     }
+  }
+
+  /// 🆕 NOUVELLE MÉTHODE : Vérifier si l'utilisateur est authentifié via la réponse
+  bool _isUserAuthenticated(Response response) {
+    // Logique pour déterminer si l'utilisateur est authentifié
+    // Par exemple, vérifier la présence de certains headers ou la structure de la réponse
+    final posts = response.data['posts'] as List?;
+    if (posts != null && posts.isNotEmpty) {
+      final firstPost = posts.first;
+      // Si le champ is_liked existe et n'est pas null, l'utilisateur est probablement authentifié
+      return firstPost['is_liked'] != null;
+    }
+    return false;
   }
 
   /// Récupérer les posts likés par l'utilisateur connecté
