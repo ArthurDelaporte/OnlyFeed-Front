@@ -12,6 +12,8 @@
     "including": "dont",
     "open": "ouvrir",
     "close": "fermer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
     "missing_parameter": "Paramètre manquant",
     "error_occurred": "Une erreur est survenue",
     "not_found": "La page demandée est introuvable.",
@@ -21,6 +23,7 @@
     "profile": "profil",
     "back_profile": "Retour au profil",
     "not_found": "Utilisateur introuvable",
+    "creator": "Créateur",
     "field": {
       "email": "email",
       "password": "mot de passe",
@@ -31,7 +34,8 @@
       "profile_picture": "photo de profil",
       "subscription_price": "prix d'abonnement",
       "fields_required": "Les champs email, mot de passe et nom d'utilisateur sont obligatoires.",
-      "profile_picture_invalid": "Format de photo invalide. Formats acceptés : JPG, PNG, WebP, HEIC."
+      "profile_picture_invalid": "Format de photo invalide. Formats acceptés : JPG, PNG, WebP, HEIC.",
+      "invalid": "Champs requis manquants"
     },
     "lang": {
       "language": "langue",
@@ -92,7 +96,19 @@
     "media_required": "Une photo est requise",
     "image_pick_error": "Erreur lors de la sélection de l'image",
     "my_posts": "Mes publications",
-    "no_posts_yet": "Vous n'avez pas encore publié de contenu"
+    "no_posts_yet": "Vous n'avez pas encore publié de contenu",
+    "not_found": "Post non trouvé",
+    "share": "Partager",
+    "comments": "Commentaires",
+    "no_comments": "Aucun commentaire",
+    "add_comment": "Ajouter un commentaire...",
+    "comment_send_error": "Erreur lors de l'envoi du commentaire",
+    "just_now": "À l'instant",
+    "premium_content": "Contenu premium"
+  },
+  "like": {
+    "login_required": "Vous devez être connecté pour liker un post",
+    "login_button": "Se connecter"
   },
   "chat": {
     "message": "message",
@@ -113,6 +129,7 @@
     "follow": "suivre",
     "subscribed": "abonné(e)",
     "subscribe": "s'abonner",
+    "unsubscribed": "Désabonnement réussi",
     "subscription_success": "Abonnement réussi !",
     "subscription_error": "Échec de l'abonnement.",
     "become_creator": "Devenir créateur",
@@ -159,7 +176,13 @@
     "no_users_found": "Aucun utilisateur trouvé",
     "try_different_search": "Essayez une recherche différente",
     "search_to_start": "Recherchez pour commencer",
-    "search_instructions": "Tapez au moins 2 caractères pour rechercher des utilisateurs"
+    "search_instructions": "Tapez au moins 2 caractères pour rechercher des utilisateurs",
+    "conversation_deleted": "Conversation supprimée",
+    "delete_error": "Erreur lors de la suppression",
+    "delete_conversation": "Supprimer la conversation",
+    "delete_conversation_warning": "Voulez-vous vraiment supprimer votre conversation avec {username} ?",
+    "important": "Important",
+    "delete_explanation": "Cette action supprimera la conversation uniquement de votre côté. L'autre utilisateur pourra toujours voir la conversation et vous envoyer de nouveaux messages."
   },
   "admin": {
     "dashboard_title": "Dashboard Administrateur",

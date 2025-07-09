@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart'; // 🆕 Ajout de Provider
 import 'package:onlyfeed_frontend/features/post/model/post_model.dart';
 import 'package:onlyfeed_frontend/features/message/presentation/share_post_dialog.dart';
+import 'package:onlyfeed_frontend/shared/notifiers/session_notifier.dart'; // 🆕 Import SessionNotifier
 
 class OnlyFeedPostCard extends StatelessWidget {
   final Post post;
@@ -25,6 +27,9 @@ class OnlyFeedPostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ Vérifier l'authentification
+    final isAuthenticated = context.watch<SessionNotifier>().isAuthenticated;
+
     return InkWell(
       onTap: () {
         // Navigation vers la page de détail du post
@@ -80,31 +85,32 @@ class OnlyFeedPostCard extends StatelessWidget {
               ),
             ),
 
-          // 🆕 Bouton de partage
-          Positioned(
-            top: 4,
-            left: 4,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: IconButton(
-                icon: Icon(
-                  Icons.share,
-                  color: Colors.white,
-                  size: 16,
+          // 🔧 Bouton de partage - SEULEMENT si connecté
+          if (isAuthenticated)
+            Positioned(
+              top: 4,
+              left: 4,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                onPressed: () => _sharePost(context),
-                splashRadius: 16,
-                padding: EdgeInsets.all(4),
-                constraints: BoxConstraints(
-                  minWidth: 32,
-                  minHeight: 32,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.share,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                  onPressed: () => _sharePost(context),
+                  splashRadius: 16,
+                  padding: EdgeInsets.all(4),
+                  constraints: BoxConstraints(
+                    minWidth: 32,
+                    minHeight: 32,
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

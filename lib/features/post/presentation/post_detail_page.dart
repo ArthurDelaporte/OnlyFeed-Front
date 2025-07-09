@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart'; // 🆕 Ajout pour SessionNotifier
 import 'package:onlyfeed_frontend/core/widgets/scaffold_with_menubar.dart';
 import 'package:onlyfeed_frontend/features/post/model/post_model.dart';
 import 'package:onlyfeed_frontend/features/like/like.dart';
 import 'package:onlyfeed_frontend/features/message/presentation/share_post_dialog.dart';
 import 'package:onlyfeed_frontend/shared/services/dio_client.dart';
+import 'package:onlyfeed_frontend/shared/notifiers/session_notifier.dart'; // 🆕 Import SessionNotifier
 
 class PostDetailPage extends StatefulWidget {
   final String username;
@@ -89,7 +91,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       // Rediriger vers le profil si le post n'existe pas
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Post non trouvé")),
+          SnackBar(content: Text("post.not_found".tr())),
         );
         context.go('/${widget.username}');
       }
@@ -157,7 +159,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         isSendingComment = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur lors de l'envoi du commentaire")),
+        SnackBar(content: Text("post.comment_send_error".tr())),
       );
     }
   }
@@ -208,6 +210,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ NOUVELLE LIGNE - Vérifier l'authentification
+    final isAuthenticated = context.watch<SessionNotifier>().isAuthenticated;
+
     if (isLoadingPost) {
       return ScaffoldWithMenubar(
         body: Center(child: CircularProgressIndicator()),
@@ -240,7 +245,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     if (isMobile) {
       // 📱 Version mobile avec zone de saisie fixée en bas
       return ScaffoldWithMenubar(
-        body: _buildMobileLayout(),
+        body: _buildMobileLayout(isAuthenticated), // 🔧 Passer isAuthenticated
       );
     } else {
       // 💻 Version desktop (côte à côte)
@@ -249,7 +254,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           child: Center(
             child: Container(
               constraints: BoxConstraints(maxWidth: 1200),
-              child: _buildDesktopLayout(),
+              child: _buildDesktopLayout(isAuthenticated), // 🔧 Passer isAuthenticated
             ),
           ),
         ),
@@ -258,7 +263,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   // 💻 Layout Desktop (côte à côte)
-  Widget _buildDesktopLayout() {
+  Widget _buildDesktopLayout(bool isAuthenticated) { // 🔧 Ajouter paramètre
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -343,7 +348,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       SizedBox(height: 8),
                     ],
                     
-                    // ✅ Row avec date, bouton like ET bouton partage
+                    // ✅ Row avec date, bouton like ET bouton partage (modifiée)
                     Row(
                       children: [
                         Text(
@@ -362,43 +367,45 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           onLikeChanged: _onLikeChanged,
                           style: LikeButtonStyle.standard,
                         ),
-                        SizedBox(width: 8),
-                        // 🆕 Bouton Partage (desktop)
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.grey[300]!,
-                              width: 1,
+                        // 🔧 Bouton Partage (desktop) - SEULEMENT si connecté
+                        if (isAuthenticated) ...[
+                          SizedBox(width: 8),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
                             ),
-                          ),
-                          child: InkWell(
-                            onTap: _sharePost,
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.share,
-                                    color: Colors.grey[600],
-                                    size: 16,
-                                  ),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    "Partager",
-                                    style: TextStyle(
-                                      fontSize: 12,
+                            child: InkWell(
+                              onTap: _sharePost,
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.share,
                                       color: Colors.grey[600],
-                                      fontWeight: FontWeight.w500,
+                                      size: 16,
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(width: 6),
+                                    Text(
+                                      "post.share".tr(),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                     
@@ -421,14 +428,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
         // Colonne de droite - Commentaires
         Expanded(
           flex: 1,
-          child: _buildCommentsSection(),
+          child: _buildCommentsSection(isAuthenticated), // 🔧 Passer isAuthenticated
         ),
       ],
     );
   }
 
   // 📱 Layout Mobile (empilé) avec zone de saisie fixée en bas
-  Widget _buildMobileLayout() {
+  Widget _buildMobileLayout(bool isAuthenticated) { // 🔧 Ajouter paramètre
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
@@ -518,7 +525,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                               SizedBox(height: 8),
                             ],
                             
-                            // ✅ Row avec date, bouton like ET bouton partage (mobile)
+                            // ✅ Row avec date, bouton like ET bouton partage (mobile modifiée)
                             Column(
                               children: [
                                 // Première ligne : Date
@@ -545,42 +552,44 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                       onLikeChanged: _onLikeChanged,
                                       style: LikeButtonStyle.compact,
                                     ),
-                                    SizedBox(width: 12),
-                                    // 🆕 Bouton Partage (mobile compact)
-                                    InkWell(
-                                      onTap: _sharePost,
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(16),
-                                          border: Border.all(
-                                            color: Colors.grey[300]!,
-                                            width: 1,
+                                    // 🔧 Bouton Partage (mobile compact) - SEULEMENT si connecté
+                                    if (isAuthenticated) ...[
+                                      SizedBox(width: 12),
+                                      InkWell(
+                                        onTap: _sharePost,
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(16),
+                                            border: Border.all(
+                                              color: Colors.grey[300]!,
+                                              width: 1,
+                                            ),
+                                            color: Colors.transparent,
                                           ),
-                                          color: Colors.transparent,
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons.share,
-                                              color: Colors.grey[600],
-                                              size: 16,
-                                            ),
-                                            SizedBox(width: 6),
-                                            Text(
-                                              "Partager",
-                                              style: TextStyle(
-                                                fontSize: 12,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.share,
                                                 color: Colors.grey[600],
-                                                fontWeight: FontWeight.w500,
+                                                size: 16,
                                               ),
-                                            ),
-                                          ],
+                                              SizedBox(width: 6),
+                                              Text(
+                                                "post.share".tr(),
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey[600],
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
+                                    ],
                                   ],
                                 ),
                               ],
@@ -720,8 +729,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
           ),
         ],
       ),
-      // Zone de saisie fixée en bas
-      bottomNavigationBar: Container(
+      // Zone de saisie fixée en bas - SEULEMENT si connecté
+      bottomNavigationBar: isAuthenticated ? Container(
         padding: EdgeInsets.fromLTRB(16, 8, 16, 
           MediaQuery.of(context).padding.bottom + 8),
         decoration: BoxDecoration(
@@ -794,12 +803,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
           ],
         ),
-      ),
+      ) : null, // 🔧 Pas de zone de saisie si non connecté
     );
   }
 
   // 💬 Section commentaires (utilisée pour desktop uniquement maintenant)
-  Widget _buildCommentsSection() {
+  Widget _buildCommentsSection(bool isAuthenticated) { // 🔧 Ajouter paramètre
     return Container(
       height: MediaQuery.of(context).size.height - 100,
       padding: EdgeInsets.all(24),
@@ -835,42 +844,43 @@ class _PostDetailPageState extends State<PostDetailPage> {
           ),
           SizedBox(height: 16),
           
-          // Zone de saisie commentaire (desktop uniquement)
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _commentController,
-                  decoration: InputDecoration(
-                    hintText: "message.type_message".tr(),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+          // Zone de saisie commentaire (desktop uniquement) - SEULEMENT si connecté
+          if (isAuthenticated) ...[
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _commentController,
+                    decoration: InputDecoration(
+                      hintText: "message.type_message".tr(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16, 
+                        vertical: 8
+                      ),
                     ),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16, 
-                      vertical: 8
-                    ),
+                    maxLines: null,
                   ),
-                  maxLines: null,
                 ),
-              ),
-              SizedBox(width: 8),
-              IconButton(
-                onPressed: isSendingComment ? null : _sendComment,
-                icon: isSendingComment 
-                    ? SizedBox(
-                        width: 20, 
-                        height: 20, 
-                        child: CircularProgressIndicator(strokeWidth: 2)
-                      )
-                    : Icon(Icons.send),
-              ),
-            ],
-          ),
-          
-          SizedBox(height: 16),
-          Divider(),
-          SizedBox(height: 16),
+                SizedBox(width: 8),
+                IconButton(
+                  onPressed: isSendingComment ? null : _sendComment,
+                  icon: isSendingComment 
+                      ? SizedBox(
+                          width: 20, 
+                          height: 20, 
+                          child: CircularProgressIndicator(strokeWidth: 2)
+                        )
+                      : Icon(Icons.send),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            Divider(),
+            SizedBox(height: 16),
+          ],
           
           // Liste des commentaires
           Expanded(

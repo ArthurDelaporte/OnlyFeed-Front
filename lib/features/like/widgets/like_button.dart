@@ -1,9 +1,12 @@
 // features/like/widgets/like_button.dart
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart'; // 🆕 Ajout pour SessionNotifier
+import 'package:go_router/go_router.dart'; // 🆕 Ajout pour navigation
 import '../service/like_service.dart';
 import '../model/like_model.dart';
 import 'like_animation.dart';
+import '../../../shared/notifiers/session_notifier.dart'; // 🆕 Import SessionNotifier
 
 class LikeButton extends StatefulWidget {
   final String postId;
@@ -55,12 +58,56 @@ class _LikeButtonState extends State<LikeButton> with SingleTickerProviderStateM
   }
 
   @override
+  void didUpdateWidget(LikeButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 🔧 NOUVELLE LOGIQUE : Réinitialiser les likes si l'état d'authentification change
+    final isAuthenticated = context.read<SessionNotifier>().isAuthenticated;
+    
+    if (!isAuthenticated) {
+      // Si l'utilisateur n'est pas connecté, forcer isLiked à false
+      setState(() {
+        _isLiked = false;
+        _likeCount = widget.initialLikeCount;
+      });
+    } else {
+      // Si l'utilisateur est connecté, utiliser les valeurs du widget
+      setState(() {
+        _likeCount = widget.initialLikeCount;
+        _isLiked = widget.initialIsLiked;
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
   }
 
   Future<void> _toggleLike() async {
+    // ✅ NOUVELLE VÉRIFICATION : Bloquer si non authentifié
+    final isAuthenticated = context.read<SessionNotifier>().isAuthenticated;
+    
+    if (!isAuthenticated) {
+      // Rediriger vers la page de login ou afficher un message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("like.login_required".tr()),
+          backgroundColor: Colors.orange,
+          behavior: SnackBarBehavior.floating,
+          action: SnackBarAction(
+            label: "like.login_button".tr(),
+            textColor: Colors.white,
+            onPressed: () {
+              // ✅ CORRECTION : Naviguer vers la page de login
+              context.go('/account/login');
+            },
+          ),
+        ),
+      );
+      return;
+    }
+
     if (_isLoading) return;
 
     setState(() {
@@ -108,24 +155,30 @@ class _LikeButtonState extends State<LikeButton> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    // ✅ VÉRIFICATION D'AUTHENTIFICATION pour l'affichage
+    final isAuthenticated = context.watch<SessionNotifier>().isAuthenticated;
+    
+    // 🔧 Si non authentifié, forcer _isLiked à false pour l'affichage
+    final displayIsLiked = isAuthenticated ? _isLiked : false;
+    
     switch (widget.style) {
       case LikeButtonStyle.compact:
-        return _buildCompactButton();
+        return _buildCompactButton(isAuthenticated, displayIsLiked);
       case LikeButtonStyle.large:
-        return _buildLargeButton();
+        return _buildLargeButton(isAuthenticated, displayIsLiked);
       case LikeButtonStyle.minimal:
-        return _buildMinimalButton();
+        return _buildMinimalButton(isAuthenticated, displayIsLiked);
       default:
-        return _buildStandardButton();
+        return _buildStandardButton(isAuthenticated, displayIsLiked);
     }
   }
 
-  Widget _buildStandardButton() {
+  Widget _buildStandardButton(bool isAuthenticated, bool displayIsLiked) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         LikeAnimation(
-          isLiked: _isLiked,
+          isLiked: displayIsLiked,
           animationController: _animationController,
           child: IconButton(
             onPressed: _isLoading ? null : _toggleLike,
@@ -136,8 +189,8 @@ class _LikeButtonState extends State<LikeButton> with SingleTickerProviderStateM
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Icon(
-                    _isLiked ? Icons.favorite : Icons.favorite_border,
-                    color: _isLiked ? Colors.red : Colors.grey[600],
+                    displayIsLiked ? Icons.favorite : Icons.favorite_border,
+                    color: displayIsLiked ? Colors.red : Colors.grey[600],
                     size: 24,
                   ),
             splashRadius: 24,
@@ -150,7 +203,7 @@ class _LikeButtonState extends State<LikeButton> with SingleTickerProviderStateM
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],
-              fontWeight: _isLiked ? FontWeight.w600 : FontWeight.normal,
+              fontWeight: displayIsLiked ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
         ],
@@ -158,7 +211,7 @@ class _LikeButtonState extends State<LikeButton> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildCompactButton() {
+  Widget _buildCompactButton(bool isAuthenticated, bool displayIsLiked) {
     return InkWell(
       onTap: _isLoading ? null : _toggleLike,
       borderRadius: BorderRadius.circular(16),
@@ -167,20 +220,20 @@ class _LikeButtonState extends State<LikeButton> with SingleTickerProviderStateM
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: _isLiked ? Colors.red : Colors.grey[300]!,
+            color: displayIsLiked ? Colors.red : Colors.grey[300]!,
             width: 1,
           ),
-          color: _isLiked ? Colors.red.withOpacity(0.1) : Colors.transparent,
+          color: displayIsLiked ? Colors.red.withOpacity(0.1) : Colors.transparent,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             LikeAnimation(
-              isLiked: _isLiked,
+              isLiked: displayIsLiked,
               animationController: _animationController,
               child: Icon(
-                _isLiked ? Icons.favorite : Icons.favorite_border,
-                color: _isLiked ? Colors.red : Colors.grey[600],
+                displayIsLiked ? Icons.favorite : Icons.favorite_border,
+                color: displayIsLiked ? Colors.red : Colors.grey[600],
                 size: 16,
               ),
             ),
@@ -190,7 +243,7 @@ class _LikeButtonState extends State<LikeButton> with SingleTickerProviderStateM
                 _formatLikeCount(_likeCount),
                 style: TextStyle(
                   fontSize: 12,
-                  color: _isLiked ? Colors.red : Colors.grey[600],
+                  color: displayIsLiked ? Colors.red : Colors.grey[600],
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -201,20 +254,20 @@ class _LikeButtonState extends State<LikeButton> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildLargeButton() {
+  Widget _buildLargeButton(bool isAuthenticated, bool displayIsLiked) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         LikeAnimation(
-          isLiked: _isLiked,
+          isLiked: displayIsLiked,
           animationController: _animationController,
           child: IconButton(
             onPressed: _isLoading ? null : _toggleLike,
             icon: _isLoading
                 ? CircularProgressIndicator(strokeWidth: 2)
                 : Icon(
-                    _isLiked ? Icons.favorite : Icons.favorite_border,
-                    color: _isLiked ? Colors.red : Colors.grey[600],
+                    displayIsLiked ? Icons.favorite : Icons.favorite_border,
+                    color: displayIsLiked ? Colors.red : Colors.grey[600],
                     size: 32,
                   ),
             splashRadius: 28,
@@ -226,22 +279,22 @@ class _LikeButtonState extends State<LikeButton> with SingleTickerProviderStateM
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey[600],
-              fontWeight: _isLiked ? FontWeight.w600 : FontWeight.normal,
+              fontWeight: displayIsLiked ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
       ],
     );
   }
 
-  Widget _buildMinimalButton() {
+  Widget _buildMinimalButton(bool isAuthenticated, bool displayIsLiked) {
     return GestureDetector(
       onTap: _isLoading ? null : _toggleLike,
       child: LikeAnimation(
-        isLiked: _isLiked,
+        isLiked: displayIsLiked,
         animationController: _animationController,
         child: Icon(
-          _isLiked ? Icons.favorite : Icons.favorite_border,
-          color: _isLiked ? Colors.red : Colors.grey[400],
+          displayIsLiked ? Icons.favorite : Icons.favorite_border,
+          color: displayIsLiked ? Colors.red : Colors.grey[400],
           size: 20,
         ),
       ),
