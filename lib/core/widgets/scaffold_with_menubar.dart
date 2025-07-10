@@ -19,6 +19,30 @@ enum SidebarItem {
 const sizeMinSidebar = 768;
 const sizeMinLabelIcon = 1024;
 
+// 🆕 NOUVEAU: Modèle pour les utilisateurs de recherche
+class SearchUser {
+  final String id;
+  final String username;
+  final String avatarUrl;
+  final bool isCreator;
+
+  SearchUser({
+    required this.id,
+    required this.username,
+    required this.avatarUrl,
+    required this.isCreator,
+  });
+
+  factory SearchUser.fromJson(Map<String, dynamic> json) {
+    return SearchUser(
+      id: json['id'] ?? '',
+      username: json['username'] ?? '',
+      avatarUrl: json['avatar_url'] ?? '',
+      isCreator: json['is_creator'] ?? false,
+    );
+  }
+}
+
 class ScaffoldWithMenubar extends StatefulWidget {
   final Widget body;
 
@@ -33,12 +57,276 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
   final _searchCtrl = TextEditingController();
   final _searchFocusNode = FocusNode();
 
+  // 🆕 NOUVELLES VARIABLES pour la recherche améliorée
+  List<SearchUser> _searchResults = [];
+  bool _isSearching = false;
+  String? _searchError;
+  
   void _onSearchSubmit(String value) {
     final username = value.trim();
     if (username.isNotEmpty) {
       context.go('/$username');
       _searchCtrl.clear();
+      Navigator.of(context).pop(); // Fermer le dialog
     }
+  }
+
+  // 🆕 NOUVELLE MÉTHODE: Recherche d'utilisateurs en temps réel
+  Future<void> _searchUsers(String query) async {
+    if (query.length < 2) {
+      setState(() {
+        _searchResults = [];
+        _searchError = null;
+        _isSearching = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isSearching = true;
+      _searchError = null;
+    });
+
+    try {
+      final response = await _dio.get(
+        '/api/users/search',
+        queryParameters: {'q': query},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> usersJson = response.data['users'] ?? [];
+        setState(() {
+          _searchResults = usersJson
+            .map((json) => SearchUser.fromJson(json))
+            .toList();
+          _isSearching = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _searchError = e.toString();
+        _isSearching = false;
+        _searchResults = [];
+      });
+    }
+  }
+
+  // 🆕 NOUVELLE MÉTHODE: Naviguer vers un profil utilisateur
+  void _navigateToUser(SearchUser user) {
+    Navigator.of(context).pop(); // Fermer le dialog
+    context.go('/${user.username}');
+    _searchCtrl.clear();
+    setState(() {
+      _searchResults = [];
+      _searchError = null;
+    });
+  }
+
+  // 🆕 NOUVELLE MÉTHODE: Widget pour afficher un utilisateur dans les résultats
+  Widget _buildUserTile(SearchUser user) {
+    return ListTile(
+      leading: CircleAvatar(
+        radius: 20,
+        backgroundImage: user.avatarUrl.isNotEmpty
+          ? NetworkImage(user.avatarUrl)
+          : null,
+        child: user.avatarUrl.isEmpty
+          ? Icon(Icons.person, size: 20)
+          : null,
+      ),
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(
+              user.username,
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
+          if (user.isCreator)
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                context.tr('user.creator'),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+        ],
+      ),
+      subtitle: Text('@${user.username}'),
+      trailing: Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: () => _navigateToUser(user),
+    );
+  }
+
+  // 🔧 MÉTHODE AMÉLIORÉE: Afficher le dialog de recherche
+  void _showImprovedSearchDialog() {
+    // Réinitialiser l'état avant d'ouvrir le dialog
+    setState(() {
+      _searchResults = [];
+      _searchError = null;
+      _isSearching = false;
+    });
+    _searchCtrl.clear();
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.search),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text("user.search.search_user".tr()),
+              ),
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _searchCtrl.clear();
+                  setState(() {
+                    _searchResults = [];
+                    _searchError = null;
+                    _isSearching = false;
+                  });
+                },
+              ),
+            ],
+          ),
+          content: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            constraints: BoxConstraints(
+              maxWidth: 400,
+              maxHeight: MediaQuery.of(context).size.height * 0.6,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 🆕 Barre de recherche améliorée
+                TextField(
+                  controller: _searchCtrl,
+                  focusNode: _searchFocusNode,
+                  decoration: InputDecoration(
+                    hintText: "user.search.search_user_hint".tr(),
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    suffixIcon: _searchCtrl.text.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(Icons.clear),
+                          onPressed: () {
+                            _searchCtrl.clear();
+                            setDialogState(() {});
+                            setState(() {
+                              _searchResults = [];
+                              _searchError = null;
+                              _isSearching = false;
+                            });
+                          },
+                        )
+                      : null,
+                  ),
+                  onChanged: (value) {
+                    setDialogState(() {});
+                    _searchUsers(value).then((_) {
+                      setDialogState(() {});
+                    });
+                  },
+                  onSubmitted: _onSearchSubmit,
+                ),
+                SizedBox(height: 16),
+                
+                // 🆕 Zone des résultats
+                Expanded(
+                  child: _isSearching
+                    ? Center(child: CircularProgressIndicator())
+                    : _searchError != null
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.error, size: 48, color: Colors.red),
+                              SizedBox(height: 8),
+                              Text(
+                                context.tr('core.error'),
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                _searchError!,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                              ),
+                            ],
+                          ),
+                        )
+                      : _searchResults.isEmpty && _searchCtrl.text.isNotEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.search_off, size: 48, color: Colors.grey),
+                                SizedBox(height: 8),
+                                Text(
+                                  "user.search.no_users_found".tr(),
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  "user.search.try_different_search".tr(),
+                                  style: TextStyle(color: Colors.grey[600]),
+                                ),
+                              ],
+                            ),
+                          )
+                        : _searchCtrl.text.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.people_outline, size: 48, color: Colors.grey),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    "user.search.search_to_start".tr(),
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "user.search.search_instructions".tr(),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Colors.grey[600]),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ListView.separated(
+                              itemCount: _searchResults.length,
+                              separatorBuilder: (context, index) => Divider(height: 1),
+                              itemBuilder: (context, index) {
+                                return _buildUserTile(_searchResults[index]);
+                              },
+                            ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    
+    // Focus automatique sur le champ de recherche
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _searchFocusNode.requestFocus();
+    });
   }
 
   Future<void> _toggleTheme() async {
@@ -91,30 +379,14 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
         context.go('/');
         break;
       case SidebarItem.search:
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text("user.search.search_user".tr()),
-            content: TextField(
-              controller: _searchCtrl,
-              focusNode: _searchFocusNode,
-              decoration: InputDecoration(hintText: "Username"),
-              onSubmitted: (_) {
-                Navigator.of(context).pop();
-                _onSearchSubmit(_searchCtrl.text);
-              },
-            ),
-          ),
-        );
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _searchFocusNode.requestFocus();
-        });
+        // 🔧 UTILISATION de la nouvelle méthode de recherche
+        _showImprovedSearchDialog();
         break;
       case SidebarItem.create:
         context.go('/$username/create');
         break;
       case SidebarItem.chats:
-      context.go('/app/messages');
+        context.go('/app/messages');
         break;
       case SidebarItem.profile:
         context.go('/$username');
@@ -307,7 +579,7 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
         return "user.profile".tr().capitalize();
       case SidebarItem.login:
         return "user.log.login".tr().capitalize();
-      case SidebarItem.adminDashboard: // 👈 Ajout
+      case SidebarItem.adminDashboard:
         return "admin.dashboard_title".tr();
     }
   }
@@ -372,5 +644,12 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
       iconColor: Theme.of(context).colorScheme.onSurface,
       tooltip: "core.more".tr().capitalize(),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    _searchFocusNode.dispose();
+    super.dispose();
   }
 }

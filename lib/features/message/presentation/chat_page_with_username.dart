@@ -1,9 +1,9 @@
-// lib/features/message/presentation/chat_page_with_username.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:onlyfeed_frontend/features/message/model/message_model.dart';
 import 'package:onlyfeed_frontend/features/message/presentation/chat_page.dart';
 import 'package:onlyfeed_frontend/shared/services/dio_client.dart';
+import 'package:dio/dio.dart';
 
 class ChatPageWithUsername extends StatefulWidget {
   final String username;
@@ -23,6 +23,7 @@ class _ChatPageWithUsernameState extends State<ChatPageWithUsername> {
   String? conversationId;
   bool isLoading = true;
   bool isNewConversation = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -35,23 +36,39 @@ class _ChatPageWithUsernameState extends State<ChatPageWithUsername> {
       print('🔍 Recherche de l\'utilisateur: ${widget.username}');
       
       // 1. Récupérer les infos de l'utilisateur
-      final userResponse = await _dio.get('/api/users/username/${widget.username}');
-      if (userResponse.statusCode == 200) {
-        final userData = userResponse.data['user'];
-        otherUser = ConversationUser(
-          id: userData['id'],
-          username: userData['username'],
-          avatarUrl: userData['avatar_url'] ?? '',
-          isCreator: userData['is_creator'] ?? false,
-        );
-        print('✅ Utilisateur trouvé: ${otherUser!.username}');
+      try {
+        final userResponse = await _dio.get('/api/users/username/${widget.username}');
+        print('🔍 Réponse complète de l\'utilisateur: ${userResponse.data}');
+        
+        if (userResponse.statusCode == 200) {
+          final userData = userResponse.data['user'];
+          
+          if (userData == null) {
+            throw Exception('Aucune donnée utilisateur trouvée');
+          }
+
+          otherUser = ConversationUser(
+            id: userData['id'],
+            username: userData['username'],
+            avatarUrl: userData['avatar_url'] ?? '',
+            isCreator: userData['is_creator'] ?? false,
+          );
+          print('✅ Utilisateur trouvé: ${otherUser!.username}');
+        } else {
+          throw Exception('Statut de réponse invalide: ${userResponse.statusCode}');
+        }
+      } on DioException catch (dioError) {
+        print('❌ Erreur Dio lors de la récupération de l\'utilisateur: ${dioError.response?.data}');
+        throw Exception('Impossible de récupérer l\'utilisateur');
       }
 
       // 2. Chercher si une conversation existe déjà
       print('🔍 Recherche de conversation existante...');
       final conversationsResponse = await _dio.get('/api/messages/conversations');
+      
       if (conversationsResponse.statusCode == 200) {
-        final conversations = conversationsResponse.data['conversations'] as List;
+        final conversations = conversationsResponse.data['conversations'] as List? ?? [];
+        print('🔍 Conversations récupérées: ${conversations.length}');
         
         // Chercher une conversation avec cet utilisateur
         for (final conv in conversations) {
@@ -70,22 +87,20 @@ class _ChatPageWithUsernameState extends State<ChatPageWithUsername> {
         print('🆕 Nouvelle conversation avec ${widget.username}');
       }
 
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
 
     } catch (e) {
       print('❌ Erreur lors du chargement: $e');
-      setState(() {
-        isLoading = false;
-      });
       
-      // 🔧 ROUTE CORRIGÉE: Retourner à la liste des conversations
       if (mounted) {
-        context.go('/app/messages');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Utilisateur "${widget.username}" non trouvé')),
-        );
+        setState(() {
+          isLoading = false;
+          _errorMessage = e.toString();
+        });
       }
     }
   }
@@ -98,7 +113,7 @@ class _ChatPageWithUsernameState extends State<ChatPageWithUsername> {
           title: Text('Chargement...'),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
-            onPressed: () => context.go('/app/messages'), // 🔧 ROUTE CORRIGÉE
+            onPressed: () => context.go('/app/messages'),
           ),
         ),
         body: Center(
@@ -114,13 +129,13 @@ class _ChatPageWithUsernameState extends State<ChatPageWithUsername> {
       );
     }
 
-    if (otherUser == null) {
+    if (_errorMessage != null || otherUser == null) {
       return Scaffold(
         appBar: AppBar(
           title: Text('Erreur'),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
-            onPressed: () => context.go('/app/messages'), // 🔧 ROUTE CORRIGÉE
+            onPressed: () => context.go('/app/messages'),
           ),
         ),
         body: Center(
@@ -134,10 +149,10 @@ class _ChatPageWithUsernameState extends State<ChatPageWithUsername> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 8),
-              Text('L\'utilisateur "${widget.username}" n\'existe pas'),
+              Text(_errorMessage ?? 'L\'utilisateur "${widget.username}" n\'existe pas'),
               SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () => context.go('/app/messages'), // 🔧 ROUTE CORRIGÉE
+                onPressed: () => context.go('/app/messages'),
                 child: Text('Retour aux conversations'),
               ),
             ],
