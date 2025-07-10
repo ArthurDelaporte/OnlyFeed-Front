@@ -12,7 +12,7 @@ class AppTheme {
     brightness: Brightness.light,
     primaryColor: AppColors.abricot,
     scaffoldBackgroundColor: Colors.white,
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.pain,
       foregroundColor: AppColors.chocolat,
       elevation: 0,
@@ -23,14 +23,14 @@ class AppTheme {
         color: AppColors.chocolat,
       ),
     ),
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: AppColors.abricot,
       secondary: AppColors.basilic,
       onPrimary: Colors.white,
       onSecondary: AppColors.chocolat,
       onSurface: AppColors.chocolat,
     ),
-    textTheme: TextTheme(
+    textTheme: const TextTheme(
       headlineLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, fontFamily: 'Poppins', color: AppColors.chocolat),
       bodyMedium: TextStyle(fontSize: 16, fontFamily: 'Inter', color: AppColors.chocolat),
       labelLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: 'Inter'),
@@ -39,13 +39,13 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.basilic,
         foregroundColor: Colors.white,
-        textStyle: TextStyle(
+        textStyle: const TextStyle(
           fontFamily: 'Inter',
           fontWeight: FontWeight.w600,
         ),
       ),
     ),
-    inputDecorationTheme: InputDecorationTheme(
+    inputDecorationTheme: const InputDecorationTheme(
       filled: true,
       fillColor: Colors.white,
       border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
@@ -56,9 +56,9 @@ class AppTheme {
 class AppDarkTheme {
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
-    scaffoldBackgroundColor: Color(0xFF1E1E1E),
+    scaffoldBackgroundColor: const Color(0xFF1E1E1E),
     primaryColor: AppColors.abricot,
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       backgroundColor: Color(0xFF2A2A2A),
       foregroundColor: Colors.white,
       elevation: 0,
@@ -69,14 +69,14 @@ class AppDarkTheme {
         color: Colors.white,
       ),
     ),
-    colorScheme: ColorScheme.dark(
+    colorScheme: const ColorScheme.dark(
       primary: AppColors.abricot,
       secondary: AppColors.basilic,
       onPrimary: Colors.white,
       onSecondary: AppColors.pain,
       onSurface: Colors.white70,
     ),
-    textTheme: TextTheme(
+    textTheme: const TextTheme(
       headlineLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, fontFamily: 'Poppins', color: Colors.white),
       bodyMedium: TextStyle(fontSize: 16, fontFamily: 'Inter', color: Colors.white70),
       labelLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: 'Inter'),
@@ -85,13 +85,13 @@ class AppDarkTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.basilic,
         foregroundColor: Colors.white,
-        textStyle: TextStyle(
+        textStyle: const TextStyle(
           fontFamily: 'Inter',
           fontWeight: FontWeight.w600,
         ),
       ),
     ),
-    inputDecorationTheme: InputDecorationTheme(
+    inputDecorationTheme: const InputDecorationTheme(
       filled: true,
       fillColor: Color(0xFF2D2D2D),
       border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
