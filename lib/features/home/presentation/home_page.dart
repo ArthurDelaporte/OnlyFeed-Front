@@ -7,7 +7,6 @@ import 'package:onlyfeed_frontend/core/widgets/scaffold_with_menubar.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart';
 import 'package:onlyfeed_frontend/features/home/widgets/feed_post_card.dart';
-import 'package:onlyfeed_frontend/shared/services/dio_client.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,11 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
-  final _dio = DioClient().dio;
-  
-  // Cache pour les infos utilisateurs
-  final Map<String, Map<String, dynamic>> _usersCache = {};
-  bool _debugMode = true;
+  bool _debugMode = false; // 🔧 Désactivé par défaut
 
   @override
   void initState() {
@@ -57,25 +52,6 @@ class _HomePageState extends State<HomePage> {
   Future<void> _onRefresh() async {
     print("🔄 Rafraîchissement du feed...");
     await context.read<PostProvider>().refreshFeed();
-  }
-
-  Future<String> _getUsernameForPost(String userId) async {
-    if (_usersCache.containsKey(userId)) {
-      return _usersCache[userId]!['username'] ?? 'Utilisateur';
-    }
-
-    try {
-      final response = await _dio.get('/api/users/$userId');
-      if (response.statusCode == 200) {
-        final userData = response.data['user'];
-        _usersCache[userId] = userData;
-        return userData['username'] ?? 'Utilisateur';
-      }
-    } catch (e) {
-      print('❌ Erreur lors de la récupération du username: $e');
-    }
-
-    return 'Utilisateur';
   }
 
   Widget _buildDebugInfo(PostProvider postProvider) {
@@ -213,7 +189,7 @@ class _HomePageState extends State<HomePage> {
         builder: (context, postProvider, child) {
           return Column(
             children: [
-              // Debug info
+              // Debug info (masqué par défaut)
               if (_debugMode) _buildDebugInfo(postProvider),
               
               // Contenu principal
@@ -290,6 +266,13 @@ class _HomePageState extends State<HomePage> {
                     icon: Icon(Icons.refresh),
                     tooltip: "Actualiser",
                   ),
+                  // 🔧 Bouton debug caché (pour développement)
+                  if (!_debugMode)
+                    IconButton(
+                      onPressed: () => setState(() => _debugMode = true),
+                      icon: Icon(Icons.bug_report, size: 16),
+                      tooltip: "Debug",
+                    ),
                 ],
               ),
             ),
@@ -301,17 +284,8 @@ class _HomePageState extends State<HomePage> {
               (context, index) {
                 final post = postProvider.feedPosts[index];
                 
-                return FutureBuilder<String>(
-                  future: _getUsernameForPost(post.userId),
-                  builder: (context, snapshot) {
-                    final username = snapshot.data ?? 'Utilisateur';
-                    
-                    return FeedPostCard(
-                      post: post,
-                      username: username,
-                    );
-                  },
-                );
+                // ✅ Plus besoin de FutureBuilder - utiliser directement FeedPostCard
+                return FeedPostCard(post: post);
               },
               childCount: postProvider.feedPosts.length,
             ),

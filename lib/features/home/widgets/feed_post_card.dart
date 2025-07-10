@@ -8,16 +8,13 @@ import 'package:onlyfeed_frontend/features/post/model/post_model.dart';
 import 'package:onlyfeed_frontend/features/like/like.dart';
 import 'package:onlyfeed_frontend/features/message/presentation/share_post_dialog.dart';
 import 'package:onlyfeed_frontend/shared/notifiers/session_notifier.dart';
-import 'package:onlyfeed_frontend/shared/services/dio_client.dart';
 
 class FeedPostCard extends StatefulWidget {
   final Post post;
-  final String username;
 
   const FeedPostCard({
     Key? key,
     required this.post,
-    required this.username,
   }) : super(key: key);
 
   @override
@@ -25,35 +22,14 @@ class FeedPostCard extends StatefulWidget {
 }
 
 class _FeedPostCardState extends State<FeedPostCard> {
-  final _dio = DioClient().dio;
   late int _likeCount;
   late bool _isLiked;
-  Map<String, dynamic>? _userInfo;
-  bool _isLoadingUser = true;
 
   @override
   void initState() {
     super.initState();
     _likeCount = widget.post.likeCount;
     _isLiked = widget.post.isLiked;
-    _loadUserInfo();
-  }
-
-  Future<void> _loadUserInfo() async {
-    try {
-      final response = await _dio.get('/api/users/${widget.post.userId}');
-      if (response.statusCode == 200) {
-        setState(() {
-          _userInfo = response.data['user'];
-          _isLoadingUser = false;
-        });
-      }
-    } catch (e) {
-      print('Erreur lors du chargement des infos utilisateur: $e');
-      setState(() {
-        _isLoadingUser = false;
-      });
-    }
   }
 
   void _onLikeChanged(LikeResponse likeResponse) {
@@ -64,22 +40,28 @@ class _FeedPostCardState extends State<FeedPostCard> {
   }
 
   void _sharePost() {
+    // ✅ Utiliser directement le username du post
+    final username = widget.post.username ?? 'utilisateur';
     showDialog(
       context: context,
       builder: (context) => SharePostDialog(
         post: widget.post,
-        username: widget.username,
+        username: username,
       ),
     );
   }
 
   void _navigateToPost() {
-    context.go('/${widget.username}/post/${widget.post.id}');
+    // ✅ Utiliser directement le username du post
+    final username = widget.post.username ?? 'utilisateur';
+    context.go('/$username/post/${widget.post.id}');
   }
 
   void _navigateToUserProfile() {
-    if (_userInfo != null) {
-      context.go('/${_userInfo!['username']}');
+    // ✅ Utiliser directement le username du post
+    final username = widget.post.username;
+    if (username != null && username.isNotEmpty) {
+      context.go('/$username');
     }
   }
 
@@ -105,6 +87,11 @@ class _FeedPostCardState extends State<FeedPostCard> {
     final isAuthenticated = context.watch<SessionNotifier>().isAuthenticated;
     final isMobile = MediaQuery.of(context).size.width < 768;
 
+    // ✅ Utiliser directement les données du post
+    final username = widget.post.username ?? 'Utilisateur';
+    final avatarUrl = widget.post.avatarUrl ?? '';
+    final isCreator = widget.post.isCreator ?? false;
+
     return Card(
       margin: EdgeInsets.symmetric(
         horizontal: isMobile ? 8 : 16,
@@ -128,12 +115,10 @@ class _FeedPostCardState extends State<FeedPostCard> {
                   onTap: _navigateToUserProfile,
                   child: CircleAvatar(
                     radius: 20,
-                    backgroundImage: _userInfo?['avatar_url'] != null && 
-                                   _userInfo!['avatar_url'].isNotEmpty
-                      ? NetworkImage(_userInfo!['avatar_url'])
+                    backgroundImage: avatarUrl.isNotEmpty
+                      ? NetworkImage(avatarUrl)
                       : null,
-                    child: _userInfo?['avatar_url'] == null || 
-                           _userInfo!['avatar_url'].isEmpty
+                    child: avatarUrl.isEmpty
                       ? Icon(Icons.person, size: 20)
                       : null,
                   ),
@@ -150,15 +135,13 @@ class _FeedPostCardState extends State<FeedPostCard> {
                         child: Row(
                           children: [
                             Text(
-                              _isLoadingUser 
-                                ? 'Chargement...' 
-                                : (_userInfo?['username'] ?? 'Utilisateur'),
+                              username,
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
                               ),
                             ),
-                            if (_userInfo?['is_creator'] == true) ...[
+                            if (isCreator) ...[
                               SizedBox(width: 6),
                               Container(
                                 padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),

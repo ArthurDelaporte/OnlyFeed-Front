@@ -8,7 +8,7 @@ import 'package:onlyfeed_frontend/shared/services/dio_client.dart';
 class PostService {
   final _dio = DioClient().dio;
 
-  // 🔧 CORRECTION: Récupérer tous les posts avec gestion d'erreur améliorée
+  // 🔧 CORRECTION: Récupérer tous les posts avec gestion d'erreur améliorée ET infos utilisateur
   Future<List<Post>> getAllPosts({bool includePaywalled = false}) async {
     try {
       print("🔍 Appel API: GET /api/posts avec paywalled=$includePaywalled");
@@ -66,7 +66,7 @@ class PostService {
         
         // Vérifier les posts après conversion
         for (var i = 0; i < posts.length && i < 3; i++) {
-          print("✅ Post $i après conversion getAllPosts - mediaURL: ${posts[i].mediaURL}");
+          print("✅ Post $i après conversion getAllPosts - mediaURL: ${posts[i].mediaURL}, username: ${posts[i].username}");
         }
         
         return posts;

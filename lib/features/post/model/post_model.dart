@@ -1,4 +1,4 @@
-// features/post/model/post_model.dart
+// lib/features/post/model/post_model.dart
 class Post {
   final String id;
   final String title;
@@ -9,6 +9,11 @@ class Post {
   final String userId;
   final int likeCount;
   final bool isLiked;
+  
+  // 🆕 NOUVELLES propriétés pour les infos utilisateur
+  final String? username;
+  final String? avatarUrl;
+  final bool? isCreator;
 
   Post({
     required this.id,
@@ -20,6 +25,10 @@ class Post {
     required this.userId,
     this.likeCount = 0,
     this.isLiked = false,
+    // 🆕 Nouveaux paramètres optionnels
+    this.username,
+    this.avatarUrl,
+    this.isCreator,
   });
 
   factory Post.fromJson(Map<String, dynamic> json) {
@@ -33,6 +42,10 @@ class Post {
       userId: json['user_id'] ?? json['UserID'] ?? '',
       likeCount: json['like_count'] ?? 0,
       isLiked: json['is_liked'] ?? false,
+      // 🆕 Gestion des nouvelles propriétés
+      username: json['username'],
+      avatarUrl: json['avatar_url'],
+      isCreator: json['is_creator'],
     );
   }
 
@@ -47,6 +60,10 @@ class Post {
       'user_id': userId,
       'like_count': likeCount,
       'is_liked': isLiked,
+      // 🆕 Nouvelles propriétés
+      'username': username,
+      'avatar_url': avatarUrl,
+      'is_creator': isCreator,
     };
   }
 
@@ -61,6 +78,9 @@ class Post {
     String? userId,
     int? likeCount,
     bool? isLiked,
+    String? username,
+    String? avatarUrl,
+    bool? isCreator,
   }) {
     return Post(
       id: id ?? this.id,
@@ -72,6 +92,9 @@ class Post {
       userId: userId ?? this.userId,
       likeCount: likeCount ?? this.likeCount,
       isLiked: isLiked ?? this.isLiked,
+      username: username ?? this.username,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      isCreator: isCreator ?? this.isCreator,
     );
   }
 }
