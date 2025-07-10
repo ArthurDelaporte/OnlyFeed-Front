@@ -157,9 +157,11 @@ class _ScaffoldWithMenubarState extends State<ScaffoldWithMenubar> {
         title: Text("OnlyFeed", style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: false,
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        actionsPadding: EdgeInsets.only(right: 16),
         actions: [
-          _buildPopupMenu()
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: _buildPopupMenu(),
+          ),
         ],
       );
     }
