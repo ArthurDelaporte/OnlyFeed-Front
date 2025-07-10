@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:onlyfeed_frontend/shared/services/token_manager.dart';
@@ -11,7 +12,9 @@ class DioClient {
   late Dio dio;
 
   DioClient._internal() {
-    final baseUrl = dotenv.env['BASE_URL'] ?? 'http://localhost:8080';
+    final baseUrl = kIsWeb
+        ? const String.fromEnvironment('BASE_URL')  // Web
+        : dotenv.env['BASE_URL'] ?? 'http://localhost:8080';
 
     dio = Dio(BaseOptions(
       baseUrl: baseUrl,

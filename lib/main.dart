@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:onlyfeed_frontend/app.dart';
 import 'package:onlyfeed_frontend/shared/shared.dart';
 import 'package:onlyfeed_frontend/features/post/providers/post_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  await dotenv.load();
+  // await dotenv.load();
 
   setUrlStrategy(PathUrlStrategy());
 
