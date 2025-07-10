@@ -38,6 +38,8 @@ class DioClient {
               options.headers['X-Refresh-Token'] = refreshToken;
             }
 
+            options.extra['withCredentials'] = true;
+
             return handler.next(options);
           },
           onResponse: (response, handler) async {
