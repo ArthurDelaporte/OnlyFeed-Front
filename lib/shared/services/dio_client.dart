@@ -13,8 +13,8 @@ class DioClient {
 
   DioClient._internal() {
     final baseUrl = kIsWeb
-        ? const String.fromEnvironment('BASE_URL')  // Web
-        : dotenv.env['BASE_URL'] ?? 'http://localhost:8080';
+        ? const String.fromEnvironment('BASE_URL', defaultValue: 'http://localhost:8080')
+        : dotenv.env['BASE_URL'] ?? 'http://localhost:8080/';
 
     dio = Dio(BaseOptions(
       baseUrl: baseUrl,
